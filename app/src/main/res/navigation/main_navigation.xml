@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/titleFragment">
+
+    <fragment
+        android:id="@+id/titleFragment"
+        android:name="com.example.notatnik.screens.TitleFragment"
+        android:label="Home"
+        tools:layout="@layout/title_fragment" />
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="com.example.notatnik.screens.notes.NotesFragment"
+        android:label="Notes"
+        tools:layout="@layout/notes_fragment" >
+        <action
+            android:id="@+id/action_notesFragment_to_passwordChange"
+            app:destination="@id/passwordChange" />
+    </fragment>
+    <fragment
+        android:id="@+id/securityFragment"
+        android:name="com.example.notatnik.screens.security.PasswordCreate"
+        android:label="Security Fragment">
+        <action
+            android:id="@+id/action_securityFragment_to_passwordCheck"
+            app:destination="@id/passwordCheck"
+            app:popUpTo="@id/titleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordCheck"
+        android:name="com.example.notatnik.screens.security.PasswordCheckFragment"
+        android:label="Password Checking"
+        tools:layout="@layout/password_check_fragment">
+        <action
+            android:id="@+id/action_passwordCheck_to_notesFragment"
+            app:destination="@id/notesFragment"
+            app:popUpTo="@id/titleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordChange"
+        android:name="com.example.notatnik.screens.security.PasswordChange"
+        android:label="PasswordChange" >
+        <action
+            android:id="@+id/action_passwordChange_to_passwordCheck"
+            app:destination="@id/passwordCheck"
+            app:popUpTo="@id/titleFragment" />
+    </fragment>
+</navigation>

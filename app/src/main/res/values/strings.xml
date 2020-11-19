@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Notatnik</string>
+    <string name="login_btn_string">Login</string>
+    <string name="login_txt_string">Enter you password:</string>
+    <string name="save_note_btn_string">Save</string>
+    <string name="second_password_string">Repeat password:</string>
+    <string name="first_password_string">Enter Password:</string>
+    <string name="info_txt_string">Create your password!</string>
+    <string name="info_changePassword_txt_string">Change your password!</string>
+    <string name="first_password_change_string">New password</string>
+    <string name="change_password_btn_string">Change your password</string>
+</resources>
