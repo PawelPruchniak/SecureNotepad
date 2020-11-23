@@ -29,9 +29,42 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun check_encrypt_if_password_is_wrong2() {
+        val passwordFirst = "eagwejkgba34Y a34y 4a3a wEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
+        val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
+
+        val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        println("password encrypted: $passwordEncrypted")
+
+        val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
+        println("password decrypted: $passwordDecrypted")
+
+        Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
+        Assert.assertNull("Verify password decrypted is null", passwordDecrypted)
+    }
+
+    @Test
     fun check_encrypt_if_password_is_correct() {
         val passwordFirst = "hasło123".toCharArray()
         val passwordSecond = "hasło123".toCharArray()
+
+        val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        println("password encrypted: $passwordEncrypted")
+
+        val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
+        println("password decrypted: $passwordDecrypted")
+
+        Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
+        Assert.assertNotNull("Verify password decrypted is not null", passwordDecrypted)
+
+    }
+
+    @Test
+    fun check_encrypt_if_password_is_correct2() {
+        val passwordFirst = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
+        val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
         val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
