@@ -72,9 +72,9 @@ class PasswordCreateViewModel(
     fun addPasswordToDatabase(password: String){
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                val password_db = Password()
-                password_db.passwordVar = password
-                database.insert(password_db)
+                val passwordDB = Password()
+                passwordDB.passwordVar = password
+                database.insert(passwordDB)
             }
         }
         Log.i("PasswordCreateViewModel", "Password was added to database!")

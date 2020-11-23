@@ -2,7 +2,10 @@ package com.example.notatnik.screens.security
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Password
 import com.example.notatnik.database.PasswordDatabaseDao
 import kotlinx.coroutines.*
@@ -27,11 +30,11 @@ class PasswordChangeViewModel(
         get() = _newPasswordEvent
 
     // Zmienna z hasłem z bazy danych
-    var password_db = MediatorLiveData<Password>()
+     var passwordDB = MediatorLiveData<Password>()
 
     init {
         // Pobieranie zmiennej z hasłem z bazy danych
-        password_db.addSource(database.getLastPassword(), password_db::setValue)
+        passwordDB.addSource(database.getLastPassword(), passwordDB::setValue)
     }
 
     // kliknięcie przycisku Save
@@ -64,12 +67,12 @@ class PasswordChangeViewModel(
     fun UpdatePasswordInDatabase(new_password: String){
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                if(password_db.value == null){
+                if(passwordDB.value == null){
 
                 }
                 else{
                     val newPassword = Password()
-                    newPassword.passwordId = password_db.value?.passwordId!!
+                    newPassword.passwordId = passwordDB.value?.passwordId!!
                     newPassword.passwordVar = new_password
                     database.update(newPassword)
                 }

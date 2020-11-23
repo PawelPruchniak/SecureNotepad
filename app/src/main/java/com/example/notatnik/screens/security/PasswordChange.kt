@@ -62,7 +62,7 @@ class PasswordChange : Fragment() {
 
 
         // Event obserwujący zmienną w której zapisane jest hasło
-        passwordViewModel.password_db.observe(viewLifecycleOwner, { password ->
+        passwordViewModel.passwordDB.observe(viewLifecycleOwner, { password ->
             if(password != null){
                 println("The password was successfully loaded")
             }

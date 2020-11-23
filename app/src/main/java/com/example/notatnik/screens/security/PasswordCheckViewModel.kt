@@ -30,11 +30,11 @@ class PasswordCheckViewModel(
         get() = _changeLoginTxtEvent
 
     // zmienna z hasłem z bazy danych
-    var password_db = MediatorLiveData<Password>()
+    var passwordDB = MediatorLiveData<Password>()
 
     init {
         // Pobieranie zmiennej z hasłem z bazy danych
-        password_db.addSource(database.getLastPassword(), password_db::setValue)
+        passwordDB.addSource(database.getLastPassword(), passwordDB::setValue)
     }
 
     fun LoginButtonClicked() {
@@ -43,7 +43,7 @@ class PasswordCheckViewModel(
 
     // Funkcja sprawdzająca poprawność wpisanego hasła
     fun CheckPassword(password: String): Boolean {
-        if(password == password_db.value?.passwordVar){
+        if(password == passwordDB.value?.passwordVar){
             return true
         }
         return false
