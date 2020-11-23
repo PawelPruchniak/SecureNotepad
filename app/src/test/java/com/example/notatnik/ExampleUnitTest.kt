@@ -18,7 +18,7 @@ class ExampleUnitTest {
         val passwordSecond = "haslo123".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
@@ -34,7 +34,7 @@ class ExampleUnitTest {
         val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
@@ -50,7 +50,7 @@ class ExampleUnitTest {
         val passwordSecond = "hasło123".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
@@ -67,7 +67,7 @@ class ExampleUnitTest {
         val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
