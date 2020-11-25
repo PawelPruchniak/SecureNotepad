@@ -26,9 +26,9 @@ internal class Encryption {
             // 2
             //PBKDF2 - derive the key from the password, don't use passwords directly
             val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
-            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val secretKeyFactory = SecretKeyFactory.getInstance(Companion.secretKeyFactory_ALGORITHM)
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val keySpec = SecretKeySpec(keyBytes, Companion.keySpec_ALGORITHM)
 
             // 3
             //Create initialization vector for AES
@@ -39,7 +39,7 @@ internal class Encryption {
 
             // 4
             //Encrypt
-            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+            val cipher = Cipher.getInstance(Companion.cipher_TRANSFORMATION)
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
             val encrypted = cipher.doFinal(dataToEncrypt)
 
@@ -48,7 +48,7 @@ internal class Encryption {
             map["iv"] = iv
             map["encrypted"] = encrypted
         } catch (e: Exception) {
-            Log.e("MYAPP", "encryption exception", e)
+            Log.e("Notatnik Encryption()", "encryption exception", e)
         }
 
         return map
@@ -66,20 +66,26 @@ internal class Encryption {
             // 2
             //regenerate key from password
             val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
-            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val secretKeyFactory = SecretKeyFactory.getInstance(Companion.secretKeyFactory_ALGORITHM)
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, "AES")
+            val keySpec = SecretKeySpec(keyBytes, Companion.keySpec_ALGORITHM)
 
             // 3
             //Decrypt
-            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+            val cipher = Cipher.getInstance(Companion.cipher_TRANSFORMATION)
             val ivSpec = IvParameterSpec(iv)
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             decrypted = cipher.doFinal(encrypted)
         } catch (e: Exception) {
-            Log.e("MYAPP", "decryption exception", e)
+            Log.e("Notatnik Encryption()", "Decryption exception", e)
         }
 
         return decrypted
+    }
+
+    companion object {
+        private const val cipher_TRANSFORMATION = "AES/CBC/PKCS5Padding" // AES/CBC/PKCS5Padding or AES/GCM/NoPadding
+        private const val secretKeyFactory_ALGORITHM = "PBKDF2WithHmacSHA1" // PBKDF2WithHmacSHA1 or PBKDF2WithHmacSHA256 or PBKDF2WithHmacSHA512
+        private const val keySpec_ALGORITHM = "AES"
     }
 }
