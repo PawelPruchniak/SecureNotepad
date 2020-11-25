@@ -18,11 +18,17 @@ class ExampleUnitTest {
         val passwordSecond = "haslo123".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8), passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
         println("password decrypted: $passwordDecrypted")
+
+        var lastLoggedIn: String? = null
+        passwordDecrypted?.let {
+            lastLoggedIn = String(it, Charsets.UTF_8)
+        }
+        println("LastLoggedIn: $lastLoggedIn")
 
         Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
         Assert.assertNull("Verify password decrypted is null", passwordDecrypted)
@@ -34,14 +40,21 @@ class ExampleUnitTest {
         val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8),passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
         println("password decrypted: $passwordDecrypted")
 
+        var lastLoggedIn: String? = null
+        passwordDecrypted?.let {
+            lastLoggedIn = String(it, Charsets.UTF_8)
+        }
+        println("LastLoggedIn: $lastLoggedIn")
+
         Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
         Assert.assertNull("Verify password decrypted is null", passwordDecrypted)
+
     }
 
     @Test
@@ -50,11 +63,17 @@ class ExampleUnitTest {
         val passwordSecond = "hasło123".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8),passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
         println("password decrypted: $passwordDecrypted")
+
+        var lastLoggedIn: String? = null
+        passwordDecrypted?.let {
+            lastLoggedIn = String(it, Charsets.UTF_8)
+        }
+        println("LastLoggedIn: $lastLoggedIn")
 
         Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
         Assert.assertNotNull("Verify password decrypted is not null", passwordDecrypted)
@@ -67,11 +86,17 @@ class ExampleUnitTest {
         val passwordSecond = "eagwejkgba34Y a34y 4a3a WEAG 1RT1G1g!132G238465 ?h345 Q".toCharArray()
 
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-        val passwordEncrypted = Encryption().encrypt(passwordFirst)
+        val passwordEncrypted = Encryption().encrypt(currentDateTimeString.toByteArray(Charsets.UTF_8),passwordFirst)
         println("password encrypted: $passwordEncrypted")
 
         val passwordDecrypted = Encryption().decrypt(passwordEncrypted, passwordSecond)
         println("password decrypted: $passwordDecrypted")
+
+        var lastLoggedIn: String? = null
+        passwordDecrypted?.let {
+            lastLoggedIn = String(it, Charsets.UTF_8)
+        }
+        println("LastLoggedIn: $lastLoggedIn")
 
         Assert.assertNotNull("Verify password encrypted is not null", passwordEncrypted)
         Assert.assertNotNull("Verify password decrypted is not null", passwordDecrypted)

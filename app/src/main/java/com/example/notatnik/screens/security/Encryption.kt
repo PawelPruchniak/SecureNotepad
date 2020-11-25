@@ -11,7 +11,8 @@ import javax.crypto.spec.SecretKeySpec
 
 internal class Encryption {
 
-    fun encrypt(password: CharArray): HashMap<String, ByteArray> {
+    fun encrypt(dataToEncrypt: ByteArray,
+                password: CharArray): HashMap<String, ByteArray> {
         val map = HashMap<String, ByteArray>()
 
         try {
@@ -40,7 +41,7 @@ internal class Encryption {
             //Encrypt
             val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
-            val encrypted = cipher.doFinal()
+            val encrypted = cipher.doFinal(dataToEncrypt)
 
             // 5
             map["salt"] = salt
