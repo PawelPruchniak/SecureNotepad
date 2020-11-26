@@ -18,20 +18,20 @@ internal class Encryption {
 
         try {
             // Generowanie salt
-            val random = SecureRandom()
+            val random = SecureRandom.getInstanceStrong()
             val salt = ByteArray(256)
             random.nextBytes(salt)
 
             // 2
             //PBKDF2 - derive the key from the password, don't use passwords directly
-            val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
+            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 256)
             val secretKeyFactory = SecretKeyFactory.getInstance(secretKeyFactory_ALGORITHM)
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
             val keySpec = SecretKeySpec(keyBytes, keySpec_ALGORITHM)
 
             // 3
             //Create initialization vector for AES
-            val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
+            val ivRandom = SecureRandom.getInstanceStrong() //not caching previous seeded instance of SecureRandom
             val iv = ByteArray(16)
             ivRandom.nextBytes(iv)
             val ivSpec = IvParameterSpec(iv)
@@ -64,7 +64,7 @@ internal class Encryption {
 
             // 2
             //regenerate key from password
-            val pbKeySpec = PBEKeySpec(password, salt, 1324, 256)
+            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 256)
             val secretKeyFactory = SecretKeyFactory.getInstance(secretKeyFactory_ALGORITHM)
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
             val keySpec = SecretKeySpec(keyBytes, keySpec_ALGORITHM)
@@ -84,7 +84,8 @@ internal class Encryption {
 
     companion object {
         private const val cipher_TRANSFORMATION = "AES/CBC/PKCS5Padding" // AES/CBC/PKCS5Padding or AES/GCM/NoPadding
-        private const val secretKeyFactory_ALGORITHM = "PBKDF2WithHmacSHA1" // PBKDF2WithHmacSHA1 or PBKDF2WithHmacSHA256 or PBKDF2WithHmacSHA512
+        private const val secretKeyFactory_ALGORITHM = "PBKDF2withHmacSHA512" // PBKDF2WithHmacSHA1 or PBKDF2WithHmacSHA256 or PBKDF2WithHmacSHA512
         private const val keySpec_ALGORITHM = "AES"
+        private const val iterationCount = 64000
     }
 }
