@@ -29,7 +29,9 @@ class NotesFragment : Fragment() {
         val application = requireNotNull(this.activity).application
         val dataSource = NotesDatabase.getInstance(application).notesDatabaseDao
 
-        val viewModelFactory = NotesViewModelFactory(dataSource, application)
+        val arguments =  NotesFragmentArgs.fromBundle(requireArguments())
+
+        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg)
         val notesViewModel = ViewModelProvider(this, viewModelFactory).get(
             NotesViewModel::class.java
         )

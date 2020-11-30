@@ -12,7 +12,8 @@ import kotlinx.coroutines.*
 
 class NotesViewModel(
     val database: NotesDatabaseDao,
-    application: Application
+    application: Application,
+    val password: String
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych

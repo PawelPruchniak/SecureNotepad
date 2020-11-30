@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_notesFragment_to_passwordChange"
             app:destination="@id/passwordChange" />
+        <argument
+            android:name="passwordArg"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/securityFragment"
@@ -26,6 +29,9 @@
             android:id="@+id/action_securityFragment_to_passwordCheck"
             app:destination="@id/passwordCheck"
             app:popUpTo="@id/titleFragment" />
+        <action
+            android:id="@+id/action_securityFragment_to_notesFragment"
+            app:destination="@id/notesFragment" />
     </fragment>
     <fragment
         android:id="@+id/passwordCheck"

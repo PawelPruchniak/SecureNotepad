@@ -51,7 +51,6 @@ internal class Encryption {
         }
 
         return encryptedData
-
     }
 
     fun decrypt(encryptedData: HashMap<String, ByteArray>, password: CharArray): ByteArray? {

@@ -11,6 +11,6 @@ data class Password(
     var passwordId: Long = 0L,
 
     @ColumnInfo(name = "password")
-    var passwordVar: String = "",
+    var passwordBool: Boolean = false
 
 )

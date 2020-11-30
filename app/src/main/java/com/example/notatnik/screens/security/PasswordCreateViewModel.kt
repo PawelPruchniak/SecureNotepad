@@ -24,19 +24,24 @@ class PasswordCreateViewModel(
     val navigateToPasswordCheckFragment: LiveData<Boolean>
         get() = _navigateToPasswordCheckFragment
 
+    private val _navigateToNoteFragment = MutableLiveData<Boolean>()
+    val navigateToNoteFragment: LiveData<Boolean>
+        get() = _navigateToNoteFragment
+
     // Event aktywowany przy tworzeniu hasła
     private val _newPasswordEvent = MutableLiveData<Boolean>()
     val newPasswordEvent: LiveData<Boolean>
         get() = _newPasswordEvent
 
     // Zmienna z hasłem z bazy danych
-    var password = MediatorLiveData<Password>()
+    var passwordExists = MediatorLiveData<Password>()
+    private var password: String? = null
 
     init {
         //clearDatabase()
 
         // Pobieranie zmiennej z hasłem z bazy danych
-        password.addSource(database.getLastPassword(), password::setValue)
+        passwordExists.addSource(database.getLastPassword(), passwordExists::setValue)
     }
 
     // Funkcja służąca do czyszczenia bazy danych
@@ -49,39 +54,41 @@ class PasswordCreateViewModel(
         Log.i("PasswordCreateViewModel", "Database was cleared!")
     }
 
-    fun saveButtonClicked(){
-        _newPasswordEvent.value = true
+
+    fun passwordIsGood(password_1: String, password_2: String): Boolean{
+        if (password_1.length  >= 8 && password_1 == password_2){
+            password = password_1
+            return true
+        }
+        return false
     }
 
-    fun onNavigationToPasswordCheckFragmentComplete() {
-        _navigateToPasswordCheckFragment.value = false
+    fun getPassword(): String? {
+        return password
+    }
+
+    fun saveButtonClicked(){
+        _newPasswordEvent.value = true
     }
 
     fun onNewPasswordEventComplete() {
         _newPasswordEvent.value = false
     }
 
-    fun PasswordIsGood(password_1: String, password_2: String): Boolean{
-        if (password_1.length  >= 8 && password_1 == password_2){
-            return true
-        }
-        return false
+    fun onNavigationToPasswordCheckFragmentComplete() {
+        _navigateToPasswordCheckFragment.value = false
     }
 
-    // Funkcja dodająca hasło do bazy danych
-    fun addPasswordToDatabase(password: String){
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                val passwordDB = Password()
-                passwordDB.passwordVar = password
-                database.insert(passwordDB)
-            }
-        }
-        Log.i("PasswordCreateViewModel", "Password was added to database!")
-    }
-
-    fun startNavigation(){
+    fun navigateToPasswordCheckFragment() {
         _navigateToPasswordCheckFragment.value = true
+    }
+
+    fun navigateToNoteFragment(){
+        _navigateToNoteFragment.value = true
+    }
+
+    fun onNavigateToNoteFragmentComplete(){
+        _navigateToNoteFragment.value = false
     }
 
 

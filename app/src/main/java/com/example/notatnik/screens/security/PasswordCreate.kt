@@ -2,14 +2,14 @@ package com.example.notatnik.screens.security
 
 import android.app.Activity
 import android.content.Context
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
@@ -47,12 +47,22 @@ class PasswordCreate : Fragment() {
             }
         })
 
+        securityViewModel.navigateToNoteFragment.observe(viewLifecycleOwner, { isTrue ->
+            if (isTrue) {
+                val createdPassword: String = securityViewModel.getPassword().toString()
+                this.findNavController().navigate(
+                        PasswordCreateDirections.actionSecurityFragmentToNotesFragment(createdPassword)
+                )
+                securityViewModel.onNavigateToNoteFragmentComplete()
+            }
+        })
+
         // Event tworzący nowe hasło
         securityViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 hideKeyboard()
-                if(securityViewModel.PasswordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
-                    securityViewModel.addPasswordToDatabase(binding.Password1.text.toString())
+                if(securityViewModel.passwordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
+                    securityViewModel.navigateToPasswordCheckFragment()
                 }
                 else{
                     binding.errorTxt.text = "Passwords don't match"
@@ -62,9 +72,9 @@ class PasswordCreate : Fragment() {
         })
 
         // Event sprawdzający czy hasło zostało już stworzone, jeżeeli tak to naviguje
-        securityViewModel.password.observe(viewLifecycleOwner, { password ->
-            if(password != null){
-                securityViewModel.startNavigation()
+        securityViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
+            if(password != null && password.passwordBool){
+                securityViewModel.navigateToNoteFragment()
             }
             else{
                 println("Password jest null!")
