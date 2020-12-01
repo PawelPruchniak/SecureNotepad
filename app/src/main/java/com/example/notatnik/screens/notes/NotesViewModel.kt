@@ -25,7 +25,7 @@ class NotesViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     // zmienna z notatką
-    var note = MediatorLiveData<Notes>()
+    var noteDatabase = MediatorLiveData<Notes>()
 
     private val _noteString = MutableLiveData<String>()
     val noteString: LiveData<String>
@@ -44,7 +44,7 @@ class NotesViewModel(
 
     init {
         _noteString.value = "loading..."
-        note.addSource(database.getLastNote(), note::setValue)
+        noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
 
         if(newPasswordBoolean){
             initializeNewNote()
@@ -52,9 +52,9 @@ class NotesViewModel(
     }
 
      fun initializeNote() {
-        val base64Encrypted = note.value?.noteEncrypted
-        val base64Salt = note.value?.noteSalt
-        val base64Iv  = note.value?.noteIv
+        val base64Encrypted = noteDatabase.value?.noteEncrypted
+        val base64Salt = noteDatabase.value?.noteSalt
+        val base64Iv  = noteDatabase.value?.noteIv
 
         val encrypted = Base64.decode(base64Encrypted, Base64.NO_WRAP)
         val iv = Base64.decode(base64Iv, Base64.NO_WRAP)
@@ -89,10 +89,22 @@ class NotesViewModel(
                 newNote.noteIv = ivBase64String
                 newNote.noteEncrypted = encryptedBase64String
 
-                database.insert(newNote)
+                if (noteDatabase == null){
+                    database.insert(newNote)
+                }
+                else{
+                    newNote.noteId = noteDatabase.value?.noteId!!
+                    database.update(newNote)
+                }
             }
         }
         Log.i("NotesViewModel", "Note was added to database!")
+    }
+
+    fun saveNewNote(note: String) {
+        val dataEncrypted = Encryption().encrypt(note.toByteArray(Charsets.UTF_8), password.toCharArray())
+        saveDataToNoteDatabase(dataEncrypted)
+        decryptNote(dataEncrypted)
     }
 
     private fun decryptNote(dataEncrypted: HashMap<String, ByteArray>) {
@@ -126,5 +138,6 @@ class NotesViewModel(
         viewModelJob.cancel()
         Log.i("NotesViewModel", "NotesViewModel destroyed!")
     }
+
 }
 

@@ -39,21 +39,19 @@ class NotesFragment : Fragment() {
         binding.lifecycleOwner = this
 
 
-        /*
+
         // Event zapisujący notatkę po kliknięciu przyciusku
         notesViewModel.eventSaveButtonClicked.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 hideKeyboard()
                 val noteText: String = binding.noteTextView.text.toString()
-                if(noteText != null){
+                if(noteText != null && notesViewModel.noteString.value != noteText){
                     println("Notatka: $noteText")
-                    notesViewModel.addNoteToDatabase(noteText)
+                    notesViewModel.saveNewNote(noteText)
                 }
                 notesViewModel.onEventSaveButtonClickedComplete()
             }
         })
-
-         */
 
         // Event nawigujący do fragmenty w którym możemy zmienić hasło
         notesViewModel.eventNavigateToPasswordChangeFragment.observe(viewLifecycleOwner, { isTrue ->
@@ -66,7 +64,7 @@ class NotesFragment : Fragment() {
         })
 
         // Event obserwujący zmienną w której są zaszyfrowane dane
-        notesViewModel.note.observe(viewLifecycleOwner, { note ->
+        notesViewModel.noteDatabase.observe(viewLifecycleOwner, { note ->
             if(note != null){
                 notesViewModel.initializeNote()
                 println("The noteEncrypted was successfully loaded")
