@@ -20,6 +20,9 @@
         <argument
             android:name="passwordArg"
             app:argType="string" />
+        <argument
+            android:name="newPassword"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/securityFragment"

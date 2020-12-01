@@ -10,7 +10,14 @@ data class Notes(
     @PrimaryKey(autoGenerate = true)
     var noteId: Long = 0L,
 
-    @ColumnInfo(name = "note")
-    var noteVar: String = "",
+    @ColumnInfo(name = "noteSalt")
+    var noteSalt: ByteArray?,
+
+    @ColumnInfo(name = "noteIv")
+    var noteIv: ByteArray,
+
+    @ColumnInfo(name = "noteEncrypted")
+    var noteEncrypted: ByteArray,
+
 
     )

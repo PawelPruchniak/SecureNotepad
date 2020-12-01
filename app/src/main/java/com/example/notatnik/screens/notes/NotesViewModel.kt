@@ -8,12 +8,15 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Notes
 import com.example.notatnik.database.NotesDatabaseDao
+import com.example.notatnik.screens.security.Encryption
 import kotlinx.coroutines.*
+import java.util.*
 
 class NotesViewModel(
-    val database: NotesDatabaseDao,
-    application: Application,
-    val password: String
+        val database: NotesDatabaseDao,
+        application: Application,
+        private val password: String,
+        private val newPasswordBoolean: Boolean
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych
@@ -36,9 +39,29 @@ class NotesViewModel(
 
     init {
         //clearDatabase()
-
+        if(newPasswordBoolean){
+            initializeNewPassword()
+        }
         // Pobranie notatki z bazy danych
         note.addSource(database.getLastNote(), note::setValue)
+    }
+
+    private fun initializeNewPassword() {
+        val newPassword = password.toCharArray()
+        val note = "Enter your notes here".toByteArray(Charsets.UTF_8)
+
+        val dataEncrypted = Encryption().encrypt(note, newPassword)
+        saveDataToNoteDatabase(dataEncrypted)
+    }
+
+    private fun saveDataToNoteDatabase(dataEncrypted: HashMap<String, ByteArray>) {
+        uiScope.launch {
+            withContext(Dispatchers.IO){
+                val newNote = Notes
+
+                val ba: ByteArray? = null
+            }
+        }
     }
 
     // funkcja służąca do czyszczenia bazy danych

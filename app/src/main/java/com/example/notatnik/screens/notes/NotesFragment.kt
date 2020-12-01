@@ -31,7 +31,7 @@ class NotesFragment : Fragment() {
 
         val arguments =  NotesFragmentArgs.fromBundle(requireArguments())
 
-        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg)
+        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg, arguments.newPassword)
         val notesViewModel = ViewModelProvider(this, viewModelFactory).get(
             NotesViewModel::class.java
         )

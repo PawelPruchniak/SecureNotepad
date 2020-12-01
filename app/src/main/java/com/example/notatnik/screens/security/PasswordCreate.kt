@@ -51,7 +51,7 @@ class PasswordCreate : Fragment() {
             if (isTrue) {
                 val createdPassword: String = securityViewModel.getPassword().toString()
                 this.findNavController().navigate(
-                        PasswordCreateDirections.actionSecurityFragmentToNotesFragment(createdPassword)
+                        PasswordCreateDirections.actionSecurityFragmentToNotesFragment(createdPassword, true)
                 )
                 securityViewModel.onNavigateToNoteFragmentComplete()
             }
