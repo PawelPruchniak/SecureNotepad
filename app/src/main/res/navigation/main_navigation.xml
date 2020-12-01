@@ -21,7 +21,7 @@
             android:name="passwordArg"
             app:argType="string" />
         <argument
-            android:name="newPassword"
+            android:name="status"
             app:argType="boolean" />
     </fragment>
     <fragment
@@ -52,8 +52,14 @@
         android:name="com.example.notatnik.screens.security.PasswordChange"
         android:label="PasswordChange" >
         <action
-            android:id="@+id/action_passwordChange_to_passwordCheck"
-            app:destination="@id/passwordCheck"
+            android:id="@+id/action_passwordChange_to_notesFragment"
+            app:destination="@id/notesFragment"
             app:popUpTo="@id/titleFragment" />
+        <argument
+            android:name="passwordArg"
+            app:argType="string" />
+        <argument
+            android:name="noteString"
+            app:argType="string" />
     </fragment>
 </navigation>

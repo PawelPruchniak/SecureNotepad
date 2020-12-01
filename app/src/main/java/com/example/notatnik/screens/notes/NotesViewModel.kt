@@ -14,10 +14,10 @@ import kotlinx.coroutines.*
 import java.util.*
 
 class NotesViewModel(
-        val database: NotesDatabaseDao,
+        private val database: NotesDatabaseDao,
         application: Application,
         private val password: String,
-        newPasswordBoolean: Boolean
+        status: Boolean
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych
@@ -45,9 +45,8 @@ class NotesViewModel(
     init {
         _noteString.value = "loading..."
         noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
-
-        if(newPasswordBoolean){
-            initializeNewNote()
+        if(status == true){
+            initializeNewPassword()
         }
     }
 
@@ -68,10 +67,10 @@ class NotesViewModel(
         decryptNote(dataEncrypted)
     }
 
-    private fun initializeNewNote() {
-        val note = "Enter your notes here".toByteArray(Charsets.UTF_8)
+     fun initializeNewPassword() {
+        val note = "Enter your notes here"
 
-        val dataEncrypted = Encryption().encrypt(note, password.toCharArray())
+        val dataEncrypted = Encryption().encrypt(note.toByteArray(Charsets.UTF_8), password.toCharArray())
         saveDataToNoteDatabase(dataEncrypted)
         decryptNote(dataEncrypted)
     }
@@ -89,7 +88,7 @@ class NotesViewModel(
                 newNote.noteIv = ivBase64String
                 newNote.noteEncrypted = encryptedBase64String
 
-                if (noteDatabase == null){
+                if (noteDatabase.value == null){
                     database.insert(newNote)
                 }
                 else{

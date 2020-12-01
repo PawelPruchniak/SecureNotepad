@@ -31,7 +31,7 @@ class NotesFragment : Fragment() {
 
         val arguments =  NotesFragmentArgs.fromBundle(requireArguments())
 
-        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg, arguments.newPassword)
+        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg, arguments.status)
         val notesViewModel = ViewModelProvider(this, viewModelFactory).get(
             NotesViewModel::class.java
         )
@@ -57,7 +57,7 @@ class NotesFragment : Fragment() {
         notesViewModel.eventNavigateToPasswordChangeFragment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 this.findNavController().navigate(
-                    NotesFragmentDirections.actionNotesFragmentToPasswordChange()
+                    NotesFragmentDirections.actionNotesFragmentToPasswordChange(arguments.passwordArg, notesViewModel.noteString.value.toString())
                 )
                 notesViewModel.onEventNavigateTopasswordChangeFragmentComplete()
             }
@@ -73,7 +73,6 @@ class NotesFragment : Fragment() {
                 println("Note is null")
             }
         })
-
         return binding.root
     }
 
