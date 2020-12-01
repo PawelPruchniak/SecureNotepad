@@ -1,6 +1,7 @@
 package com.example.notatnik.screens.notes
 
 import android.app.Application
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -55,13 +56,19 @@ class NotesViewModel(
         decryptNote(dataEncrypted)
     }
 
-    private fun saveDataToNoteDatabase(dataEncrypted: HashMap<String, ByteArray>) {
+    private fun saveDataToNoteDatabase(map: HashMap<String, ByteArray>) {
         uiScope.launch {
             withContext(Dispatchers.IO){
                 val newNote = Notes()
-                newNote.noteSalt = dataEncrypted["salt"]
-                newNote.noteIv = dataEncrypted["iv"]
-                newNote.noteEncrypted = dataEncrypted["encrypted"]
+
+                val encryptedBase64String = Base64.encodeToString(map["encrypted"], Base64.NO_WRAP)
+                val saltBase64String = Base64.encodeToString(map["salt"], Base64.NO_WRAP)
+                val ivBase64String = Base64.encodeToString(map["iv"], Base64.NO_WRAP)
+
+                newNote.noteSalt = saltBase64String
+                newNote.noteIv = ivBase64String
+                newNote.noteEncrypted = encryptedBase64String
+
                 database.insert(newNote)
             }
         }
