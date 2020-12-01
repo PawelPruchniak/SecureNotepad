@@ -8,7 +8,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Password
 import com.example.notatnik.database.PasswordDatabaseDao
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 class PasswordCreateViewModel(
         val database: PasswordDatabaseDao,
@@ -38,22 +40,10 @@ class PasswordCreateViewModel(
     private var password: String? = null
 
     init {
-        //clearDatabase()
 
         // Pobieranie zmiennej z hasłem z bazy danych
         passwordExists.addSource(database.getLastPassword(), passwordExists::setValue)
     }
-
-    // Funkcja służąca do czyszczenia bazy danych
-    private fun clearDatabase() {
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                database.clear()
-            }
-        }
-        Log.i("PasswordCreateViewModel", "Database was cleared!")
-    }
-
 
     fun passwordIsGood(password_1: String, password_2: String): Boolean{
         if (password_1.length  >= 8 && password_1 == password_2){

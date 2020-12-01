@@ -39,6 +39,7 @@ class NotesFragment : Fragment() {
         binding.lifecycleOwner = this
 
 
+        /*
         // Event zapisujący notatkę po kliknięciu przyciusku
         notesViewModel.eventSaveButtonClicked.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
@@ -51,6 +52,8 @@ class NotesFragment : Fragment() {
                 notesViewModel.onEventSaveButtonClickedComplete()
             }
         })
+
+         */
 
         // Event nawigujący do fragmenty w którym możemy zmienić hasło
         notesViewModel.eventNavigateToPasswordChangeFragment.observe(viewLifecycleOwner, { isTrue ->

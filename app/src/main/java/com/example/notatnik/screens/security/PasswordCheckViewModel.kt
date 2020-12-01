@@ -41,6 +41,7 @@ class PasswordCheckViewModel(
         _checkPasswordEvent.value = true
     }
 
+    /*
     // Funkcja sprawdzająca poprawność wpisanego hasła
     fun CheckPassword(password: String): Boolean {
         if(password == passwordDB.value?.passwordVar){
@@ -48,6 +49,8 @@ class PasswordCheckViewModel(
         }
         return false
     }
+
+     */
 
     fun PasswordMatch() {
         _navigateToNotesFragment.value = true

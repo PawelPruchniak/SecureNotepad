@@ -8,7 +8,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Password
 import com.example.notatnik.database.PasswordDatabaseDao
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 class PasswordChangeViewModel(
     val database: PasswordDatabaseDao,
@@ -63,6 +65,7 @@ class PasswordChangeViewModel(
         return false
     }
 
+    /*
     // Funkcja dodająca zmienione hasło do bazy danych
     fun UpdatePasswordInDatabase(new_password: String){
         uiScope.launch {
@@ -80,6 +83,8 @@ class PasswordChangeViewModel(
         }
         Log.i("PasswordChangeViewModel", "Password was updated in database!")
     }
+
+     */
 
     override fun onCleared() {
         super.onCleared()

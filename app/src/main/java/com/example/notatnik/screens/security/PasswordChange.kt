@@ -45,6 +45,7 @@ class PasswordChange : Fragment() {
             }
         })
 
+        /*
         // Event słuzący do stworzenia nowego hasła
         passwordViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
@@ -59,6 +60,8 @@ class PasswordChange : Fragment() {
                 passwordViewModel.onNewPasswordEventComplete()
             }
         })
+
+         */
 
 
         // Event obserwujący zmienną w której zapisane jest hasło

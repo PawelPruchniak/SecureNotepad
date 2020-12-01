@@ -34,7 +34,8 @@
             app:popUpTo="@id/titleFragment" />
         <action
             android:id="@+id/action_securityFragment_to_notesFragment"
-            app:destination="@id/notesFragment" />
+            app:destination="@id/notesFragment"
+            app:popUpTo="@id/titleFragment" />
     </fragment>
     <fragment
         android:id="@+id/passwordCheck"

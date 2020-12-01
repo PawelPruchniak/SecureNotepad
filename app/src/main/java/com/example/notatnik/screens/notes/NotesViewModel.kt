@@ -25,6 +25,7 @@ class NotesViewModel(
 
     // zmienna z notatką
     var note = MediatorLiveData<Notes>()
+    var noteString: String = ""
 
     // Event aktywowany po kliknięciu przycisku zapisania notatki
     private val _eventSaveButtonClicked = MutableLiveData<Boolean>()
@@ -43,58 +44,37 @@ class NotesViewModel(
             initializeNewPassword()
         }
         // Pobranie notatki z bazy danych
-        note.addSource(database.getLastNote(), note::setValue)
+        // note.addSource(database.getLastNote(), note::setValue)
     }
 
     private fun initializeNewPassword() {
-        val newPassword = password.toCharArray()
         val note = "Enter your notes here".toByteArray(Charsets.UTF_8)
 
-        val dataEncrypted = Encryption().encrypt(note, newPassword)
+        val dataEncrypted = Encryption().encrypt(note, password.toCharArray())
         saveDataToNoteDatabase(dataEncrypted)
+        decryptNote(dataEncrypted)
     }
 
     private fun saveDataToNoteDatabase(dataEncrypted: HashMap<String, ByteArray>) {
         uiScope.launch {
             withContext(Dispatchers.IO){
-                val newNote = Notes
-
-                val ba: ByteArray? = null
-            }
-        }
-    }
-
-    // funkcja służąca do czyszczenia bazy danych
-    private fun clearDatabase() {
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                database.clear()
-            }
-        }
-        Log.i("PasswordCreateViewModel", "Database was cleared!")
-    }
-
-    // Funkcja służąca do zapisania nowej notatki w bazie danych
-    fun addNoteToDatabase(noteText: String){
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                if(note.value == null)
-                {
-                    val newNote = Notes()
-                    newNote.noteVar = noteText
-
-                    database.insert(newNote)
-                }
-                else{
-                    val newNote = Notes()
-                    newNote.noteId = note.value?.noteId!!
-                    newNote.noteVar = noteText
-
-                    database.update(newNote)
-                }
+                val newNote = Notes()
+                newNote.noteSalt = dataEncrypted["salt"]
+                newNote.noteIv = dataEncrypted["iv"]
+                newNote.noteEncrypted = dataEncrypted["encrypted"]
+                database.insert(newNote)
             }
         }
         Log.i("NotesViewModel", "Note was added to database!")
+    }
+
+    private fun decryptNote(dataEncrypted: HashMap<String, ByteArray>) {
+        val dataDecrypted = Encryption().decrypt(dataEncrypted, password.toCharArray())
+        var dataDecryptedString: String? = null
+        dataDecrypted?.let {
+            dataDecryptedString = String(it, Charsets.UTF_8)
+        }
+        noteString = dataDecryptedString.toString()
     }
 
     // Kliknięcie przycisku Save

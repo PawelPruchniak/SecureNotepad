@@ -62,7 +62,7 @@ class PasswordCreate : Fragment() {
             if (isTrue) {
                 hideKeyboard()
                 if(securityViewModel.passwordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
-                    securityViewModel.navigateToPasswordCheckFragment()
+                    securityViewModel.navigateToNoteFragment()
                 }
                 else{
                     binding.errorTxt.text = "Passwords don't match"
@@ -74,7 +74,7 @@ class PasswordCreate : Fragment() {
         // Event sprawdzający czy hasło zostało już stworzone, jeżeeli tak to naviguje
         securityViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
             if(password != null && password.passwordBool){
-                securityViewModel.navigateToNoteFragment()
+                securityViewModel.navigateToPasswordCheckFragment()
             }
             else{
                 println("Password jest null!")

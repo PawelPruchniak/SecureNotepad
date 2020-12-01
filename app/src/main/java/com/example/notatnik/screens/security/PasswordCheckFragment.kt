@@ -11,7 +11,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.PasswordCheckFragmentBinding
@@ -38,6 +37,7 @@ class PasswordCheckFragment : Fragment() {
         binding.viewModel = passwordViewModel
         binding.lifecycleOwner = this
 
+        /*
         // Event który sprawdza poprawność wpisanego hasła
         passwordViewModel.checkPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
@@ -51,6 +51,8 @@ class PasswordCheckFragment : Fragment() {
             }
         })
 
+         */
+
         // Event zmieniający txtView aby wyświetlał error po niepoprawnym wpisaniu hasła
         passwordViewModel.changeLoginTxtEvent.observe(viewLifecycleOwner) { isTrue ->
             if (isTrue) {
@@ -60,6 +62,7 @@ class PasswordCheckFragment : Fragment() {
             }
         }
 
+        /*
         // Event navigujący do NotesFragment
         passwordViewModel.navigateToNotesFragment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
@@ -69,6 +72,8 @@ class PasswordCheckFragment : Fragment() {
                 passwordViewModel.onNavigateToNotesFragmentComplete()
             }
         })
+
+         */
 
         // Event obserwujący zmienną w której zapisane jest hasło
         passwordViewModel.passwordDB.observe(viewLifecycleOwner, { password ->
