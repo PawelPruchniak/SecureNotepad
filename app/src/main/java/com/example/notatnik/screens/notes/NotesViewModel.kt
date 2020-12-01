@@ -17,7 +17,7 @@ class NotesViewModel(
         val database: NotesDatabaseDao,
         application: Application,
         private val password: String,
-        private val newPasswordBoolean: Boolean
+        newPasswordBoolean: Boolean
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych
@@ -26,7 +26,10 @@ class NotesViewModel(
 
     // zmienna z notatką
     var note = MediatorLiveData<Notes>()
-    var noteString: String = ""
+
+    private val _noteString = MutableLiveData<String>()
+    val noteString: LiveData<String>
+        get() = _noteString
 
     // Event aktywowany po kliknięciu przycisku zapisania notatki
     private val _eventSaveButtonClicked = MutableLiveData<Boolean>()
@@ -40,15 +43,32 @@ class NotesViewModel(
 
 
     init {
-        //clearDatabase()
+        _noteString.value = "loading..."
+        note.addSource(database.getLastNote(), note::setValue)
+
         if(newPasswordBoolean){
-            initializeNewPassword()
+            initializeNewNote()
         }
-        // Pobranie notatki z bazy danych
-        // note.addSource(database.getLastNote(), note::setValue)
     }
 
-    private fun initializeNewPassword() {
+     fun initializeNote() {
+        val base64Encrypted = note.value?.noteEncrypted
+        val base64Salt = note.value?.noteSalt
+        val base64Iv  = note.value?.noteIv
+
+        val encrypted = Base64.decode(base64Encrypted, Base64.NO_WRAP)
+        val iv = Base64.decode(base64Iv, Base64.NO_WRAP)
+        val salt = Base64.decode(base64Salt, Base64.NO_WRAP)
+
+        val dataEncrypted = HashMap<String, ByteArray>()
+         dataEncrypted["salt"] = salt
+         dataEncrypted["iv"] = iv
+         dataEncrypted["encrypted"] = encrypted
+
+        decryptNote(dataEncrypted)
+    }
+
+    private fun initializeNewNote() {
         val note = "Enter your notes here".toByteArray(Charsets.UTF_8)
 
         val dataEncrypted = Encryption().encrypt(note, password.toCharArray())
@@ -81,7 +101,7 @@ class NotesViewModel(
         dataDecrypted?.let {
             dataDecryptedString = String(it, Charsets.UTF_8)
         }
-        noteString = dataDecryptedString.toString()
+        _noteString.value = dataDecryptedString
     }
 
     // Kliknięcie przycisku Save

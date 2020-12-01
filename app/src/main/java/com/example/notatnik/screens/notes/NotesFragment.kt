@@ -65,6 +65,17 @@ class NotesFragment : Fragment() {
             }
         })
 
+        // Event obserwujący zmienną w której są zaszyfrowane dane
+        notesViewModel.note.observe(viewLifecycleOwner, { note ->
+            if(note != null){
+                notesViewModel.initializeNote()
+                println("The noteEncrypted was successfully loaded")
+            }
+            else{
+                println("Note is null")
+            }
+        })
+
         return binding.root
     }
 
