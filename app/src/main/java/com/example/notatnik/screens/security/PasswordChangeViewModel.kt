@@ -90,7 +90,7 @@ class PasswordChangeViewModel(
     }
 
     // Funkcja sprawdzająca czy nowe hasło które próbujemy stworzyć zgadza się z jego powtórzeniem
-    fun PasswordIsGood(password_1: String, password_2: String): Boolean{
+    fun passwordIsGood(password_1: String, password_2: String): Boolean{
         if (password_1.length  >= 8 && password_1 == password_2 && password_1 != password){
             password = password_1
             return true

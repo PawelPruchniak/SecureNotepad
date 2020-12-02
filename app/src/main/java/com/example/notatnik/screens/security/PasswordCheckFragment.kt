@@ -43,10 +43,10 @@ class PasswordCheckFragment : Fragment() {
         passwordViewModel.checkPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 hideKeyboard()
-                if (passwordViewModel.CheckPassword(binding.passwordTxt.text.toString())) {
-                    passwordViewModel.PasswordMatch()
+                if (passwordViewModel.checkPassword(binding.passwordTxt.text.toString())) {
+                    passwordViewModel.passwordMatch()
                 } else {
-                    passwordViewModel.PasswordDontMatch()
+                    passwordViewModel.passwordDontMatch()
                 }
                 passwordViewModel.onCheckPasswordEventComplete()
             }
@@ -56,7 +56,7 @@ class PasswordCheckFragment : Fragment() {
         // Event zmieniający txtView aby wyświetlał error po niepoprawnym wpisaniu hasła
         passwordViewModel.changeLoginTxtEvent.observe(viewLifecycleOwner) { isTrue ->
             if (isTrue) {
-                binding.loginTxt.text = "Wrong password, try again:"
+                binding.loginTxt.text = getString(R.string.wrong_password_string)
                 binding.loginTxt.setTextColor(RED)
                 passwordViewModel.onChangeLoginTxtEventComplete()
             }
@@ -91,10 +91,6 @@ class PasswordCheckFragment : Fragment() {
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU
     private fun Fragment.hideKeyboard() {
         view?.let { activity?.hideKeyboard(it) }
-    }
-
-    fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
     }
 
     private fun Context.hideKeyboard(view: View) {

@@ -19,7 +19,7 @@ import com.example.notatnik.databinding.PasswordChangeFragmentBinding
 class PasswordChange : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         // Setting binding
         val binding: PasswordChangeFragmentBinding =
             DataBindingUtil.inflate(inflater, R.layout.password_change_fragment, container, false)
@@ -41,12 +41,12 @@ class PasswordChange : Fragment() {
         passwordViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 hideKeyboard()
-                if(passwordViewModel.PasswordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
+                if(passwordViewModel.passwordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
                     passwordViewModel.saveDataToDatabase()
                     passwordViewModel.navigateToNoteFragment()
                 }
                 else{
-                    binding.errorTxt.text = "Passwords don't match or password is exacly like previous"
+                    binding.errorTxt.text = getString(R.string.password_change_error_txt)
                 }
                 passwordViewModel.onNewPasswordEventComplete()
             }
@@ -76,10 +76,6 @@ class PasswordChange : Fragment() {
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU
     private fun Fragment.hideKeyboard() {
         view?.let { activity?.hideKeyboard(it) }
-    }
-
-    fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
     }
 
     private fun Context.hideKeyboard(view: View) {

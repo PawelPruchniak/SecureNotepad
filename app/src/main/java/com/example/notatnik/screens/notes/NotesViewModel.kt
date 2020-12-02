@@ -45,7 +45,7 @@ class NotesViewModel(
     init {
         _noteString.value = "loading..."
         noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
-        if(status == true){
+        if(status){
             initializeNewPassword()
         }
     }
@@ -67,7 +67,7 @@ class NotesViewModel(
         decryptNote(dataEncrypted)
     }
 
-     fun initializeNewPassword() {
+     private fun initializeNewPassword() {
         val note = "Enter your notes here"
 
         val dataEncrypted = Encryption().encrypt(note.toByteArray(Charsets.UTF_8), password.toCharArray())

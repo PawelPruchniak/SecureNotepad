@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
@@ -77,7 +78,9 @@
                 app:layout_constraintBottom_toTopOf="@+id/Password_2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/error_txt" />
+                app:layout_constraintTop_toBottomOf="@+id/error_txt"
+                android:importantForAutofill="no"
+                tools:ignore="LabelFor" />
 
             <TextView
                 android:id="@+id/second_password_txt"
@@ -106,7 +109,9 @@
                 app:layout_constraintBottom_toTopOf="@+id/save_btn"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Password_1" />
+                app:layout_constraintTop_toBottomOf="@+id/Password_1"
+                android:importantForAutofill="no"
+                tools:ignore="LabelFor" />
 
             <Button
                 android:id="@+id/save_btn"

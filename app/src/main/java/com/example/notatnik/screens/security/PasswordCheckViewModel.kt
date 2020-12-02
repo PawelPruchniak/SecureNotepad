@@ -40,7 +40,7 @@ class PasswordCheckViewModel(
     }
 
     // Funkcja sprawdzająca poprawność wpisanego hasła
-    fun CheckPassword(password: String): Boolean {
+    fun checkPassword(password: String): Boolean {
 
         val base64Encrypted = note.value?.noteEncrypted
         val base64Salt = note.value?.noteSalt
@@ -65,21 +65,21 @@ class PasswordCheckViewModel(
         return password
     }
 
-    fun LoginButtonClicked() {
+    fun loginButtonClicked() {
         _checkPasswordEvent.value = true
     }
     fun onCheckPasswordEventComplete() {
         _checkPasswordEvent.value = false
     }
 
-    fun PasswordMatch() {
+    fun passwordMatch() {
         _navigateToNotesFragment.value = true
     }
     fun onNavigateToNotesFragmentComplete(){
         _navigateToNotesFragment.value = false
     }
 
-    fun PasswordDontMatch() {
+    fun passwordDontMatch() {
         _changeLoginTxtEvent.value = true
     }
     fun onChangeLoginTxtEventComplete(){

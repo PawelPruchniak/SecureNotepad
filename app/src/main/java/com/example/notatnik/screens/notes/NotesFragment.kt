@@ -45,8 +45,7 @@ class NotesFragment : Fragment() {
             if (isTrue) {
                 hideKeyboard()
                 val noteText: String = binding.noteTextView.text.toString()
-                if(noteText != null && notesViewModel.noteString.value != noteText){
-                    println("Notatka: $noteText")
+                if(notesViewModel.noteString.value != noteText){
                     notesViewModel.saveNewNote(noteText)
                 }
                 notesViewModel.onEventSaveButtonClickedComplete()
@@ -80,10 +79,6 @@ class NotesFragment : Fragment() {
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU
     private fun Fragment.hideKeyboard() {
         view?.let { activity?.hideKeyboard(it) }
-    }
-
-    fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
     }
 
     private fun Context.hideKeyboard(view: View) {

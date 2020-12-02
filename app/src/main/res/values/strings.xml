@@ -10,4 +10,7 @@
     <string name="first_password_change_string">New password</string>
     <string name="change_password_btn_string">Change your password</string>
     <string name="save_button_string">Save</string>
+    <string name="password_change_error_txt">Passwords don\'t match or password is exacly like previous</string>
+    <string name="wrong_password_string">Wrong password, try again:</string>
+    <string name="password_dont_match_string">Passwords don\'t match</string>
 </resources>

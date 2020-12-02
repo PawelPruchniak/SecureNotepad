@@ -65,7 +65,7 @@ class PasswordCreate : Fragment() {
                     securityViewModel.navigateToNoteFragment()
                 }
                 else{
-                    binding.errorTxt.text = "Passwords don't match"
+                    binding.errorTxt.text = getString(R.string.password_dont_match_string)
                 }
                 securityViewModel.onNewPasswordEventComplete()
             }
@@ -88,10 +88,6 @@ class PasswordCreate : Fragment() {
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU
     private fun Fragment.hideKeyboard() {
         view?.let { activity?.hideKeyboard(it) }
-    }
-
-    fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
     }
 
     private fun Context.hideKeyboard(view: View) {
