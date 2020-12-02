@@ -17,32 +17,34 @@ internal class Encryption {
         val encryptedData = HashMap<String, ByteArray>()
 
         try {
+            // 1
             // Generowanie salt
             val random = SecureRandom.getInstanceStrong()
             val salt = ByteArray(256)
             random.nextBytes(salt)
 
             // 2
-            //PBKDF2 - derive the key from the password, don't use passwords directly
-            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 256)
-            val secretKeyFactory = SecretKeyFactory.getInstance(secretKeyFactory_ALGORITHM)
+            // PBKDF2 za pomocą hasła, salt i iteracji tworzy klucz
+            val pbKeySpec = PBEKeySpec(password, salt, 64000, 256)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, keySpec_ALGORITHM)
+            val keySpec = SecretKeySpec(keyBytes, "AES")
 
             // 3
-            //Create initialization vector for AES
-            val ivRandom = SecureRandom.getInstanceStrong() //not caching previous seeded instance of SecureRandom
+            // Ponieważ używamy CBC musimy stworzyć Initialization Vector (IV)
+            val ivRandom = SecureRandom.getInstanceStrong()
             val iv = ByteArray(16)
             ivRandom.nextBytes(iv)
             val ivSpec = IvParameterSpec(iv)
 
             // 4
-            //Encrypt
-            val cipher = Cipher.getInstance(cipher_TRANSFORMATION)
+            // Szyfrujemy
+            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
             val encrypted = cipher.doFinal(dataToEncrypt)
 
             // 5
+            // Zapisywanie
             encryptedData["salt"] = salt
             encryptedData["iv"] = iv
             encryptedData["encrypted"] = encrypted
@@ -57,23 +59,25 @@ internal class Encryption {
         var decryptedData: ByteArray? = null
         try {
             // 1
+            // Pobieramy sól, IV, i zaszyfrowane dane
             val salt = encryptedData["salt"]
             val iv = encryptedData["iv"]
             val encrypted = encryptedData["encrypted"]
 
             // 2
-            //regenerate key from password
-            val pbKeySpec = PBEKeySpec(password, salt, iterationCount, 256)
-            val secretKeyFactory = SecretKeyFactory.getInstance(secretKeyFactory_ALGORITHM)
+            //  Wyciąganie klucza z hasła, tworzenie go
+            val pbKeySpec = PBEKeySpec(password, salt, 64000, 256)
+            val secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
             val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
-            val keySpec = SecretKeySpec(keyBytes, keySpec_ALGORITHM)
+            val keySpec = SecretKeySpec(keyBytes, "AES")
 
             // 3
-            //Decrypt
-            val cipher = Cipher.getInstance(cipher_TRANSFORMATION)
+            // Rozszyfrowywanie
+            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
             val ivSpec = IvParameterSpec(iv)
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
             decryptedData = cipher.doFinal(encrypted)
+
         } catch (e: Exception) {
             Log.e("Notatnik Encryption()", "Decryption exception", e)
         }
@@ -81,10 +85,4 @@ internal class Encryption {
         return decryptedData
     }
 
-    companion object {
-        private const val cipher_TRANSFORMATION = "AES/CBC/PKCS5Padding" // AES/CBC/PKCS5Padding or AES/GCM/NoPadding
-        private const val secretKeyFactory_ALGORITHM = "PBKDF2withHmacSHA512" // PBKDF2WithHmacSHA1 or PBKDF2WithHmacSHA256 or PBKDF2WithHmacSHA512
-        private const val keySpec_ALGORITHM = "AES"
-        private const val iterationCount = 64000
-    }
 }
