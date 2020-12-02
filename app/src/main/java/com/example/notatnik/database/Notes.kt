@@ -11,11 +11,11 @@ data class Notes(
     var noteId: Long = 0L,
 
     @ColumnInfo(name = "noteSalt")
-    var noteSalt: String = "",
+    var noteSalt: String? = null,
 
     @ColumnInfo(name = "noteIv")
-    var noteIv: String = "",
+    var noteIv: String? = null,
 
     @ColumnInfo(name = "noteEncrypted")
-    var noteEncrypted: String = "",
+    var noteEncrypted: String? = null
     )
