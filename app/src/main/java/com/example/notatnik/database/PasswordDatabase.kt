@@ -4,33 +4,42 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SQLiteDatabaseHook
+import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [Password::class], version = 3, exportSchema = false)
+@Database(entities = [Password::class], version = 4, exportSchema = false)
 abstract class PasswordDatabase : RoomDatabase() {
 
     abstract val passwordDatabaseDao: PasswordDatabaseDao
 
     companion object {
-
         @Volatile
-        private var INSTANCE: PasswordDatabase? = null
+        private var passwordDatabaseSecure: PasswordDatabase? = null
 
         fun getInstance(context: Context): PasswordDatabase {
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        PasswordDatabase::class.java,
-                        "password_database"
-                    )
-                        .fallbackToDestructiveMigration()
-                        .build()
-                    INSTANCE = instance
+            return passwordDatabaseSecure ?: synchronized(this) {
+                passwordDatabaseSecure ?: buildDatabase(context).also {
+                    passwordDatabaseSecure = it
                 }
-                return instance
             }
+        }
+
+        private fun buildDatabase(context: Context):  PasswordDatabase {
+            val dbname = "password_database_secure"
+            val builder = Room.databaseBuilder(
+                    context.applicationContext,
+                    PasswordDatabase::class.java, "${dbname}.db"
+            )
+            val passphrase: ByteArray = SQLiteDatabase.getBytes("P@s5P4ras3VeryL0n9".toCharArray())
+            val factory = SupportFactory(passphrase, object : SQLiteDatabaseHook {
+                override fun preKey(database: SQLiteDatabase?) = Unit
+                override fun postKey(database: SQLiteDatabase?) {
+                    database?.rawExecSQL("PRAGMA cipher_memory_security = ON")
+                }
+            })
+            builder.openHelperFactory(factory)
+            return builder.build()
         }
     }
 }
