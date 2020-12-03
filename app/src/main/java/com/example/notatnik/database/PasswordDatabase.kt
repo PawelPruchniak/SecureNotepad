@@ -31,7 +31,7 @@ abstract class PasswordDatabase : RoomDatabase() {
                     context.applicationContext,
                     PasswordDatabase::class.java, "${dbname}.db"
             )
-            val passphrase: ByteArray = SQLiteDatabase.getBytes("P@s5P4ras3VeryL0n9".toCharArray())
+            val passphrase: ByteArray = SQLiteDatabase.getBytes("P@s5P4ras3VeryL0n9forPaaS1g1wo7rd".toCharArray())
             val factory = SupportFactory(passphrase, object : SQLiteDatabaseHook {
                 override fun preKey(database: SQLiteDatabase?) = Unit
                 override fun postKey(database: SQLiteDatabase?) {
