@@ -10,7 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.NotesDatabase
 import com.example.notatnik.databinding.NotesFragmentBinding
@@ -52,15 +51,6 @@ class NotesFragment : Fragment() {
             }
         })
 
-        // Event nawigujący do fragmenty w którym możemy zmienić hasło
-        notesViewModel.eventNavigateToPasswordChangeFragment.observe(viewLifecycleOwner, { isTrue ->
-            if (isTrue) {
-                this.findNavController().navigate(
-                    NotesFragmentDirections.actionNotesFragmentToPasswordChange(arguments.passwordArg, notesViewModel.noteString.value.toString())
-                )
-                notesViewModel.onEventNavigateTopasswordChangeFragmentComplete()
-            }
-        })
 
         // Event obserwujący zmienną w której są zaszyfrowane dane
         notesViewModel.noteDatabase.observe(viewLifecycleOwner, { note ->

@@ -10,7 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.PasswrdCreateFragmentBinding
@@ -38,16 +37,16 @@ class PasswordCreate : Fragment() {
         binding.lifecycleOwner = this
 
         // Event navigujący do PasswordCheckFragment
-        securityViewModel.navigateToPasswordCheckFragment.observe(viewLifecycleOwner, { isTrue ->
+/*        securityViewModel.navigateToPasswordCheckFragment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 this.findNavController().navigate(
                         PasswordCreateDirections.actionSecurityFragmentToPasswordCheck()
                 )
                 securityViewModel.onNavigationToPasswordCheckFragmentComplete()
             }
-        })
+        })*/
 
-        securityViewModel.navigateToNoteFragment.observe(viewLifecycleOwner, { isTrue ->
+/*        securityViewModel.navigateToNoteFragment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 val createdPassword: String = securityViewModel.getPassword().toString()
                 this.findNavController().navigate(
@@ -55,7 +54,7 @@ class PasswordCreate : Fragment() {
                 )
                 securityViewModel.onNavigateToNoteFragmentComplete()
             }
-        })
+        })*/
 
         // Event tworzący nowe hasło
         securityViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->

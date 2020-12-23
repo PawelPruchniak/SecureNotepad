@@ -36,11 +36,6 @@ class NotesViewModel(
     val eventSaveButtonClicked: LiveData<Boolean>
         get() = _eventSaveButtonClicked
 
-    // Event aktywowany po kliknięciu przycisku zmiany hasła
-    private val _eventNavigateToPasswordChangeFragment = MutableLiveData<Boolean>()
-    val eventNavigateToPasswordChangeFragment: LiveData<Boolean>
-        get() = _eventNavigateToPasswordChangeFragment
-
 
     init {
         _noteString.value = "loading..."
@@ -122,15 +117,7 @@ class NotesViewModel(
     fun onEventSaveButtonClickedComplete(){
         _eventSaveButtonClicked.value = false
     }
-
-    // Kliknięcie przycisku Change your Password
-    fun onChangePasswordButtonClicked(){
-        _eventNavigateToPasswordChangeFragment.value = true
-    }
-    fun onEventNavigateTopasswordChangeFragmentComplete() {
-        _eventNavigateToPasswordChangeFragment.value = false
-    }
-
+    
 
     override fun onCleared() {
         super.onCleared()
