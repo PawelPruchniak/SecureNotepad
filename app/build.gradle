@@ -102,6 +102,9 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:4.4.1'
     implementation "androidx.sqlite:sqlite-ktx:2.1.0"
 
+    // Biometric
+    implementation "androidx.biometric:biometric:1.0.1"
+
     implementation ('com.squareup.retrofit2:converter-simplexml:2.0.0-beta3'){
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
