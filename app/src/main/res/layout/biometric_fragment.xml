@@ -12,31 +12,32 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/info_changePassword_txt"
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/use_biometrics"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginTop="@dimen/margin_large"
                 android:layout_marginBottom="@dimen/margin_medium"
-                android:text="@string/biometric_ayth_string"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/save_btn"
+                android:text="Use biometrics"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#0000EE"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/save_btn"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/success"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:text="@string/button_auth_string"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/info_changePassword_txt" />
+                android:layout_margin="@dimen/margin_medium"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/use_biometrics"
+                tools:text="@string/already_signedin" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
