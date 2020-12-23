@@ -14,9 +14,6 @@
         android:name="com.example.notatnik.screens.notes.NotesFragment"
         android:label="Notes"
         tools:layout="@layout/notes_fragment" >
-        <action
-            android:id="@+id/action_notesFragment_to_passwordChange"
-            app:destination="@id/passwordChange" />
         <argument
             android:name="passwordArg"
             app:argType="string" />
@@ -27,39 +24,30 @@
     <fragment
         android:id="@+id/securityFragment"
         android:name="com.example.notatnik.screens.security.PasswordCreate"
-        android:label="Security Fragment">
-        <action
-            android:id="@+id/action_securityFragment_to_passwordCheck"
-            app:destination="@id/passwordCheck"
-            app:popUpTo="@id/titleFragment" />
-        <action
-            android:id="@+id/action_securityFragment_to_notesFragment"
-            app:destination="@id/notesFragment"
-            app:popUpTo="@id/titleFragment" />
-    </fragment>
+        android:label="Security Fragment"/>
     <fragment
         android:id="@+id/passwordCheck"
         android:name="com.example.notatnik.screens.security.PasswordCheckFragment"
         android:label="Password Checking"
-        tools:layout="@layout/password_check_fragment">
-        <action
-            android:id="@+id/action_passwordCheck_to_notesFragment"
-            app:destination="@id/notesFragment"
-            app:popUpTo="@id/titleFragment" />
-    </fragment>
+        tools:layout="@layout/password_check_fragment"/>
     <fragment
         android:id="@+id/passwordChange"
         android:name="com.example.notatnik.screens.security.PasswordChange"
         android:label="PasswordChange" >
-        <action
-            android:id="@+id/action_passwordChange_to_notesFragment"
-            app:destination="@id/notesFragment"
-            app:popUpTo="@id/titleFragment" />
         <argument
             android:name="passwordArg"
             app:argType="string" />
         <argument
             android:name="noteString"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/biometricFragment"
+        android:name="com.example.notatnik.screens.security.BiometricFragment"
+        android:label="biometric_fragment"
+        tools:layout="@layout/biometric_fragment" >
+        <action
+            android:id="@+id/action_biometricFragment_to_notesFragment"
+            app:destination="@id/notesFragment" />
     </fragment>
 </navigation>
