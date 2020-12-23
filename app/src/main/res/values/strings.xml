@@ -44,10 +44,9 @@
         Secure lock screen hasn\'t set been up.\n
         Go to \'Settings -> Security -> Fingerprint\' to set up a fingerprint or face
     </string>
-    <string name="prompt_info_title">My App\'s Authentication</string>
-    <string name="prompt_info_subtitle">Please login to get access</string>
-    <string name="prompt_info_description">My App is using Android biometric authentication</string>
-    <string name="prompt_info_use_app_password">Use app password</string>
+    <string name="prompt_info_title">Notes app Authentication</string>
+    <string name="prompt_info_description">App is using Android biometric authentication</string>
+    <string name="prompt_info_use_app_password">Close</string>
     <string name="biometric_auth_string">Authorize your login with fingerprint</string>
     <string name="button_auth_string">Authorize</string>
 </resources>

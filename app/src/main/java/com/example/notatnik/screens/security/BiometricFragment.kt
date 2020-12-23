@@ -260,11 +260,10 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     private fun createPromptInfo(): BiometricPrompt.PromptInfo {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.prompt_info_title))
-            .setSubtitle(getString(R.string.prompt_info_subtitle))
             .setDescription(getString(R.string.prompt_info_description))
             .setConfirmationRequired(false)
             .setNegativeButtonText(getString(R.string.prompt_info_use_app_password))
-            // .setDeviceCredentialAllowed(true) // Allow PIN/pattern/password authentication.
+            //.setDeviceCredentialAllowed(true) // Allow PIN/pattern/password authentication.
             // Also note that setDeviceCredentialAllowed and setNegativeButtonText are
             // incompatible so that if you uncomment one you must comment out the other
             .build()
