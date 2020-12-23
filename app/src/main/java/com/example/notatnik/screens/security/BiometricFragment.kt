@@ -237,7 +237,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
                 super.onAuthenticationError(errorCode, errString)
                 Log.d(TAG, "$errorCode :: $errString")
                 if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
-                    loginWithPassword() // Because negative button says use application password
+                    Log.d(TAG, "Authentication closed")
                 }
             }
 
@@ -270,15 +270,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         return promptInfo
     }
 
-    private fun loginWithPassword() {
-        /*
-        Log.d(TAG, "Use app password")
-        val fragment = FingerprintAuthenticationDialogFragment()
-        fragment.setCallback(this@MainActivity)
-        fragment.show(fragmentManager, DIALOG_FRAGMENT_TAG)
-        */
-    }
-
     private inner class PurchaseButtonClickListener internal constructor(
         internal var cipher: Cipher,
         internal var keyName: String
@@ -291,8 +282,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
             if (initCipher(cipher, keyName)) {
                 biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
-            } else {
-                loginWithPassword()
             }
         }
     }
