@@ -104,6 +104,7 @@ dependencies {
 
     // Biometric
     implementation "androidx.biometric:biometric:1.0.1"
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     implementation ('com.squareup.retrofit2:converter-simplexml:2.0.0-beta3'){
         exclude group: 'xpp3', module: 'xpp3'
