@@ -4,27 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.notatnik.R
+import com.example.notatnik.databinding.BiometricFragmentBinding
 
 class BiometricFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = BiometricFragment()
-    }
-
-    private lateinit var viewModel: BiometricViewModel
+    private lateinit var biometricViewModel: BiometricViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.biometric_fragment, container, false)
+        // Setting binding
+        val binding: BiometricFragmentBinding =
+            DataBindingUtil.inflate(inflater, R.layout.biometric_fragment, container, false)
+
+        binding.viewModel = biometricViewModel
+        binding.lifecycleOwner = this
+
+        return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(BiometricViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
 
 }
