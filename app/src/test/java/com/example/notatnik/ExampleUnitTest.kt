@@ -3,6 +3,7 @@ package com.example.notatnik
 import com.example.notatnik.screens.security.Encryption
 import org.junit.Assert
 import org.junit.Test
+import org.junit.jupiter.api.RepeatedTest
 import java.text.DateFormat
 import java.util.*
 
@@ -12,7 +13,8 @@ import java.util.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
-    @Test
+
+    @RepeatedTest(10)
     fun check_encrypt_if_password_is_wrong() {
         val passwordCorrect = "hasło123".toCharArray()
         val passwordWrong = "haslo123".toCharArray()
