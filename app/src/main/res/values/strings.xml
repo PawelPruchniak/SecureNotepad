@@ -13,4 +13,6 @@
     <string name="password_change_error_txt">Passwords don\'t match or password is exacly like previous</string>
     <string name="wrong_password_string">Wrong password, try again:</string>
     <string name="password_dont_match_string">Passwords don\'t match</string>
+    <string name="biometric_ayth_string">Use your fingerprint to authorize login</string>
+    <string name="button_auth_string">Authorize</string>
 </resources>
