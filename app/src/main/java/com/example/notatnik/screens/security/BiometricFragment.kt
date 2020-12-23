@@ -158,15 +158,11 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             // If the user authenticated with fingerprint, verify using cryptography and then show
             // the confirmation message.
             crypto?.cipher?.let { tryEncrypt(it) }
-        } else {
-            // Authentication happened with backup password. Just show the confirmation message.
-            showConfirmation()
         }
     }
 
     // Show confirmation message. Also show crypto information if fingerprint was used.
     private fun showConfirmation(encrypted: ByteArray? = null) {
-        binding.confirmationMessage.visibility = View.VISIBLE
         if (encrypted != null) {
             binding.encryptedMessage.run {
                 visibility = View.VISIBLE
@@ -290,7 +286,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
-            binding.confirmationMessage.visibility = View.GONE
             binding.encryptedMessage.visibility = View.GONE
 
             val promptInfo = createPromptInfo()
