@@ -18,8 +18,10 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
+import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.BiometricFragmentBinding
 import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
 import com.example.notatnik.screens.security.biometric.FingerprintAuthenticationDialogFragment
@@ -45,7 +47,14 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         // Setting binding
         binding = DataBindingUtil.inflate(inflater, R.layout.biometric_fragment, container, false)
 
-        application = requireNotNull(this.activity).application
+        val application = requireNotNull(this.activity).application
+        val dataSource = PasswordDatabase.getInstance(application).passwordDatabaseDao
+
+        val viewModelFactory = BiometricViewModelFactory(dataSource, application)
+        val biometricViewModel = ViewModelProvider(this, viewModelFactory).get(
+                BiometricViewModel::class.java
+        )
+        binding.viewModel = biometricViewModel
         binding.lifecycleOwner = this
 
         setupKeyStoreAndKeyGenerator()
@@ -53,6 +62,16 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         biometricPrompt = createBiometricPrompt()
         setUpAuthorizeButton(cipherNotInvalidated, defaultCipher)
+
+        // Event sprawdzający czy hasło zostało już stworzone, jeżeeli tak to naviguje
+        biometricViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
+            if(password != null && password.passwordBool){
+                println("Password was created!")
+            }
+            else{
+                println("Password jest null!")
+            }
+        })
 
         return binding.root
     }
@@ -300,6 +319,9 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             }
         }
     }
+
+
+
 
     companion object {
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
