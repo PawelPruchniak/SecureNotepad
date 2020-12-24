@@ -18,6 +18,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.databinding.BiometricFragmentBinding
 import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
@@ -35,6 +36,8 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var application: Application
     private lateinit var binding: BiometricFragmentBinding
+    private var passwordCreated: Boolean = false
+    private lateinit var password: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -163,6 +166,8 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
     // Show confirmation message. Also show crypto information if fingerprint was used.
     private fun showConfirmation(encrypted: ByteArray? = null) {
+        password = Base64.encodeToString(encrypted, 0)
+        print("Password: $password")
         if (encrypted != null) {
             binding.encryptedMessage.run {
                 visibility = View.VISIBLE
@@ -182,8 +187,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             when (e) {
                 is BadPaddingException,
                 is IllegalBlockSizeException -> {
-/*                    Toast.makeText(this, "Failed to encrypt the data with the generated key. "
-                            + "Retry the purchase", Toast.LENGTH_LONG).show()*/
                     Log.e(TAG, "Failed to encrypt the data with the generated key. ${e.message}")
                 }
                 else -> throw e
@@ -200,6 +203,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
      * invalidated even if a new fingerprint is enrolled. The default value is `true` - the key will
      * be invalidated if a new fingerprint is enrolled.
      */
+
     override fun createKey(keyName: String, invalidatedByBiometricEnrollment: Boolean) {
         // The enrolling flow for fingerprint. This is where you ask the user to set up fingerprint
         // for your flow. Use of keys is necessary if you need to know if the set of enrolled
@@ -250,11 +254,22 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
                 super.onAuthenticationSucceeded(result)
                 Log.d(TAG, "Authentication was successful")
                 onPurchased(true, result.cryptoObject)
+                startNavigate()
             }
         }
 
         val biometricPrompt = BiometricPrompt(this, executor, callback)
         return biometricPrompt
+    }
+
+    private fun startNavigate() {
+        if(passwordCreated){
+            passwordCreated = true
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", false))
+        }
+        else{
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true))
+        }
     }
 
     private fun createPromptInfo(): BiometricPrompt.PromptInfo {
