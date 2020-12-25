@@ -1,7 +1,6 @@
 package com.example.notatnik.screens.security
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
@@ -32,7 +31,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
     private lateinit var keyStore: KeyStore
     private lateinit var keyGenerator: KeyGenerator
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var application: Application
     private lateinit var binding: BiometricFragmentBinding
@@ -268,8 +266,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             }
         }
 
-        val biometricPrompt = BiometricPrompt(this, executor, callback)
-        return biometricPrompt
+        return BiometricPrompt(this, executor, callback)
     }
 
     private fun startNavigate() {
@@ -283,7 +280,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     }
 
     private fun createPromptInfo(): BiometricPrompt.PromptInfo {
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        return BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.prompt_info_title))
             .setDescription(getString(R.string.prompt_info_description))
             .setConfirmationRequired(false)
@@ -292,7 +289,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             // Also note that setDeviceCredentialAllowed and setNegativeButtonText are
             // incompatible so that if you uncomment one you must comment out the other
             .build()
-        return promptInfo
     }
 
     private inner class PurchaseButtonClickListener(
