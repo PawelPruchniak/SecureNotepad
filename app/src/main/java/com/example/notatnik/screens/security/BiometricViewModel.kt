@@ -6,9 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import com.example.notatnik.database.Password
 import com.example.notatnik.database.PasswordDatabaseDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 
 class BiometricViewModel(
         val database: PasswordDatabaseDao,
@@ -31,5 +29,16 @@ class BiometricViewModel(
         super.onCleared()
         viewModelJob.cancel()
         Log.i("BiometricViewModel", "BiometricViewModel destroyed!")
+    }
+
+    fun passwordCreated() {
+        uiScope.launch {
+            withContext(Dispatchers.IO){
+                val passwordExists = Password()
+                passwordExists.passwordBool = true
+                database.insert(passwordExists)
+            }
+        }
+        Log.i("BiometricViewModel", "PasswordExists was added to database!")
     }
 }

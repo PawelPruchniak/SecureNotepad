@@ -38,8 +38,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var application: Application
     private lateinit var binding: BiometricFragmentBinding
-    private var passwordCreated: Boolean = false
-    private lateinit var password: String
+    private var passwordBool: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -47,7 +46,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         // Setting binding
         binding = DataBindingUtil.inflate(inflater, R.layout.biometric_fragment, container, false)
 
-        val application = requireNotNull(this.activity).application
+        application = requireNotNull(this.activity).application
         val dataSource = PasswordDatabase.getInstance(application).passwordDatabaseDao
 
         val viewModelFactory = BiometricViewModelFactory(dataSource, application)
@@ -67,6 +66,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         biometricViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
             if(password != null && password.passwordBool){
                 println("Password was created!")
+                this.passwordBool = password.passwordBool
             }
             else{
                 println("Password jest null!")
@@ -185,8 +185,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
     // Show confirmation message. Also show crypto information if fingerprint was used.
     private fun showConfirmation(encrypted: ByteArray? = null) {
-        password = Base64.encodeToString(encrypted, 0)
-        print("Password: $password")
         if (encrypted != null) {
             binding.encryptedMessage.run {
                 visibility = View.VISIBLE
@@ -282,11 +280,11 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     }
 
     private fun startNavigate() {
-        if(passwordCreated){
-            passwordCreated = true
+        if(passwordBool){
             this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", false))
         }
         else{
+            binding.viewModel!!.passwordCreated()
             this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true))
         }
     }
