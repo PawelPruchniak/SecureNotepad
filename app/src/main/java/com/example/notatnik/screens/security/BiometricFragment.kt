@@ -3,10 +3,8 @@ package com.example.notatnik.screens.security
 import android.app.Application
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
-import android.security.keystore.KeyProperties
 import android.security.keystore.KeyProperties.*
 import android.util.Base64
 import android.util.Log
@@ -41,7 +39,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     private var passwordBool: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
 
         // Setting binding
         binding = DataBindingUtil.inflate(inflater, R.layout.biometric_fragment, container, false)
@@ -57,19 +55,18 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         binding.lifecycleOwner = this
 
         setupKeyStoreAndKeyGenerator()
-        val (defaultCipher: Cipher, cipherNotInvalidated: Cipher) = setupCiphers()
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val defaultCipher: Cipher = setupCiphers()
         biometricPrompt = createBiometricPrompt()
-        setUpAuthorizeButton(cipherNotInvalidated, defaultCipher)
+        setUpAuthorizeButton(defaultCipher)
 
-        // Event sprawdzający czy hasło zostało już stworzone, jeżeeli tak to naviguje
+        // Event sprawdzający czy hasło zostało już stworzone
         biometricViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
             if(password != null && password.passwordBool){
                 println("Password was created!")
                 this.passwordBool = password.passwordBool
             }
             else{
-                println("Password jest null!")
+                println("Password was not created!")
             }
         })
 
@@ -77,12 +74,11 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     }
 
     /**
-     * Enables or disables purchase buttons and sets the appropriate click listeners.
+     * Enables or disables button and sets the appropriate click listeners.
      *
-     * @param cipherNotInvalidated cipher for the not invalidated purchase button
-     * @param defaultCipher the default cipher, used for the purchase button
+     * @param defaultCipher the default cipher, used for the authorize button
      */
-    private fun setUpAuthorizeButton(cipherNotInvalidated: Cipher, defaultCipher: Cipher) {
+    private fun setUpAuthorizeButton(defaultCipher: Cipher) {
         val authorizeButton = binding.authorizeBtn
 
         if (BiometricManager.from(
@@ -123,15 +119,13 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
     }
 
     /**
-     * Sets up default cipher and a non-invalidated cipher
+     * Sets up default cipher
      */
-    private fun setupCiphers(): Pair<Cipher, Cipher> {
+    private fun setupCiphers(): Cipher {
         val defaultCipher: Cipher
-        val cipherNotInvalidated: Cipher
         try {
             val cipherString = "$KEY_ALGORITHM_AES/$BLOCK_MODE_CBC/$ENCRYPTION_PADDING_PKCS7"
             defaultCipher = Cipher.getInstance(cipherString)
-            cipherNotInvalidated = Cipher.getInstance(cipherString)
         } catch (e: Exception) {
             when (e) {
                 is NoSuchAlgorithmException,
@@ -140,7 +134,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
                 else -> throw e
             }
         }
-        return Pair(defaultCipher, cipherNotInvalidated)
+        return defaultCipher
     }
 
     /**
@@ -175,10 +169,9 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
      * @param withBiometrics `true` if the purchase was made by using a fingerprint
      * @param crypto the Crypto object
      */
-    override fun onPurchased(withBiometrics: Boolean, crypto: BiometricPrompt.CryptoObject?) {
+    override fun onAuthorize(withBiometrics: Boolean, crypto: BiometricPrompt.CryptoObject?) {
         if (withBiometrics) {
-            // If the user authenticated with fingerprint, verify using cryptography and then show
-            // the confirmation message.
+            // If the user authenticated with fingerprint, verify using cryptography and then show the confirmation message.
             crypto?.cipher?.let { tryEncrypt(it) }
         }
     }
@@ -188,7 +181,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         if (encrypted != null) {
             binding.encryptedMessage.run {
                 visibility = View.VISIBLE
-                text = Base64.encodeToString(encrypted, 0 /* flags */)
+                text = Base64.encodeToString(encrypted, 0)
             }
         }
     }
@@ -228,7 +221,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         try {
             keyStore.load(null)
 
-            val keyProperties = KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            val keyProperties = PURPOSE_ENCRYPT or PURPOSE_DECRYPT
             val builder = KeyGenParameterSpec.Builder(keyName, keyProperties)
                 .setBlockModes(BLOCK_MODE_CBC)
                 .setUserAuthenticationRequired(true)
@@ -270,7 +263,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 Log.d(TAG, "Authentication was successful")
-                onPurchased(true, result.cryptoObject)
+                onAuthorize(true, result.cryptoObject)
                 startNavigate()
             }
         }
@@ -302,9 +295,9 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         return promptInfo
     }
 
-    private inner class PurchaseButtonClickListener internal constructor(
-        internal var cipher: Cipher,
-        internal var keyName: String
+    private inner class PurchaseButtonClickListener(
+         var cipher: Cipher,
+         var keyName: String
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -318,12 +311,8 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         }
     }
 
-
-
-
     companion object {
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
-        private const val DIALOG_FRAGMENT_TAG = "myFragment"
         private const val KEY_NAME_NOT_INVALIDATED = "key_not_invalidated"
         private const val SECRET_MESSAGE = "Very secret message"
         private const val TAG = "MainActivity"

@@ -20,6 +20,7 @@ class BiometricViewModel(
     // Zmienna z Boolem który oznaczy czy hasło zostało już stworzone czy nie.
     var passwordExists = MediatorLiveData<Password>()
 
+
     init {
         // Pobieranie zmiennej z boolem z bazy danych
         passwordExists.addSource(database.getLastPassword(), passwordExists::setValue)
@@ -30,6 +31,7 @@ class BiometricViewModel(
         viewModelJob.cancel()
         Log.i("BiometricViewModel", "BiometricViewModel destroyed!")
     }
+
 
     fun passwordCreated() {
         uiScope.launch {
