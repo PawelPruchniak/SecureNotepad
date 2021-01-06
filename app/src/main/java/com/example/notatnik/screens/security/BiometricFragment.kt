@@ -19,7 +19,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.BiometricFragmentBinding
-import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
 import java.io.IOException
 import java.security.*
 import java.security.cert.CertificateException
@@ -53,10 +52,17 @@ class BiometricFragment : Fragment() {
         binding.viewModel = biometricViewModel
         binding.lifecycleOwner = this
 
+        // keyStore i KeyGenerator
         setupKeyStoreAndKeyGenerator()
-        val defaultCipher: Cipher = setupCiphers()
+
+        // Cipher
+        val cipher: Cipher = setupCiphers()
+
+        // BiometricPrompt
         biometricPrompt = createBiometricPrompt()
-        setUpAuthorizeButton(defaultCipher)
+
+        // AuthorizeButton
+        setUpAuthorizeButton(cipher)
 
         // Event sprawdzający czy hasło zostało już stworzone
         biometricViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
@@ -73,20 +79,20 @@ class BiometricFragment : Fragment() {
     }
 
     /**
-     * Enables or disables button and sets the appropriate click listeners.
+     * Tworzy authorizeButton i przypisuje mu odpowiedni ClickListener
      *
-     * @param defaultCipher the default cipher, used for the authorize button
+     * @param cipher obiekt Cipher, używany do uwierzytelniania.
      */
-    private fun setUpAuthorizeButton(defaultCipher: Cipher) {
+    private fun setUpAuthorizeButton(cipher: Cipher) {
         val authorizeButton = binding.authorizeBtn
 
         if (BiometricManager.from(
                 application).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
-            createKey(DEFAULT_KEY_NAME, true)
+            createKey(DEFAULT_KEY_NAME)
 
             authorizeButton.run {
                 isEnabled = true
-                setOnClickListener(PurchaseButtonClickListener(defaultCipher, DEFAULT_KEY_NAME))
+                setOnClickListener(AuthorizeButtonClickListener(cipher, DEFAULT_KEY_NAME))
             }
         } else {
             print(getString(R.string.setup_lock_screen))
@@ -95,15 +101,17 @@ class BiometricFragment : Fragment() {
     }
 
     /**
-     * Sets up KeyStore and KeyGenerator
+     * Funkcja tworząca KeyStore i KeyGenerator
      */
     private fun setupKeyStoreAndKeyGenerator() {
+        // KeyStore
         try {
             keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
         } catch (e: KeyStoreException) {
             throw RuntimeException("Failed to get an instance of KeyStore", e)
         }
 
+        // KeyGenerator
         try {
             keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
         } catch (e: Exception) {
@@ -116,14 +124,15 @@ class BiometricFragment : Fragment() {
         }
     }
 
+
     /**
-     * Sets up default cipher
+     * Funkcja tworząca obiekt Cipher
      */
     private fun setupCiphers(): Cipher {
-        val defaultCipher: Cipher
+        val cipher: Cipher
         try {
             val cipherString = "$KEY_ALGORITHM_AES/$BLOCK_MODE_CBC/$ENCRYPTION_PADDING_PKCS7"
-            defaultCipher = Cipher.getInstance(cipherString)
+            cipher = Cipher.getInstance(cipherString)
         } catch (e: Exception) {
             when (e) {
                 is NoSuchAlgorithmException,
@@ -132,15 +141,14 @@ class BiometricFragment : Fragment() {
                 else -> throw e
             }
         }
-        return defaultCipher
+        return cipher
     }
 
     /**
-     * Initialize the [Cipher] instance with the created key in the [createKey] method.
+     * Inicjalizowanie obiektu [Cipher] z stworzonym kluczem w metodzie [createKey].
      *
-     * @param keyName the key name to init the cipher
-     * @return `true` if initialization succeeded, `false` if the lock screen has been disabled or
-     * reset after key generation, or if a fingerprint was enrolled after key generation.
+     * @param cipher obiekt Cipher
+     * @param keyName nazwa klucza do inicjalizacji cipher
      */
     private fun initCipher(cipher: Cipher, keyName: String): Boolean {
         try {
@@ -163,16 +171,12 @@ class BiometricFragment : Fragment() {
 
 
     /**
-     * Creates a symmetric key in the Android Key Store which can only be used after the user has
-     * authenticated with a fingerprint.
+     * Funkcja tworząca symetryczny klucz w Android Key Store, który może być użyty tylko po
+     * uwierzytelnieniu przez odcisk palca użytkownika
      *
-     * @param keyName the name of the key to be created
-     * @param invalidatedByBiometricEnrollment if `false` is passed, the created key will not be
-     * invalidated even if a new fingerprint is enrolled. The default value is `true` - the key will
-     * be invalidated if a new fingerprint is enrolled.
+     * @param keyName nazwa klucza który zostanie stworzony w tym wypadku DEFAULT_KEY_NAME
      */
-
-    fun createKey(keyName: String, invalidatedByBiometricEnrollment: Boolean) {
+    fun createKey(keyName: String) {
         // The enrolling flow for fingerprint. This is where you ask the user to set up fingerprint
         // for your flow. Use of keys is necessary if you need to know if the set of enrolled
         // fingerprints has changed.
@@ -184,7 +188,7 @@ class BiometricFragment : Fragment() {
                 .setBlockModes(BLOCK_MODE_CBC)
                 .setUserAuthenticationRequired(true)
                 .setEncryptionPaddings(ENCRYPTION_PADDING_PKCS7)
-                .setInvalidatedByBiometricEnrollment(invalidatedByBiometricEnrollment)
+                .setInvalidatedByBiometricEnrollment(true)
 
             keyGenerator.run {
                 init(builder.build())
@@ -201,6 +205,9 @@ class BiometricFragment : Fragment() {
         }
     }
 
+    /**
+     * Funkcja tworząca BiometricPrompt oraz obsługująca Error Failed Succeeded uwierzytelniania odciskiem palca
+     */
     private fun createBiometricPrompt(): BiometricPrompt {
         val executor = ContextCompat.getMainExecutor(context)
 
@@ -228,10 +235,11 @@ class BiometricFragment : Fragment() {
         return BiometricPrompt(this, executor, callback)
     }
 
+    /**
+     * Funkcja nawigująca do fragmentu z notatkami
+     */
     private fun startNavigate() {
         if(passwordBool){
-            keyStore.load(null)
-            val key = keyStore.getKey(DEFAULT_KEY_NAME, null) as SecretKey
             this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", false))
         }
         else{
@@ -240,6 +248,9 @@ class BiometricFragment : Fragment() {
         }
     }
 
+    /**
+     * Funkcja tworząca PromptInfo (planszę pokazująca "chęć" uwierzytelniania)
+     */
     private fun createPromptInfo(): BiometricPrompt.PromptInfo {
         return BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.prompt_info_title))
@@ -252,7 +263,10 @@ class BiometricFragment : Fragment() {
             .build()
     }
 
-    private inner class PurchaseButtonClickListener(
+    /**
+     * Funkcja ustawiająca ClickListener
+     */
+    private inner class AuthorizeButtonClickListener(
          var cipher: Cipher,
          var keyName: String
     ) : View.OnClickListener {
@@ -261,7 +275,6 @@ class BiometricFragment : Fragment() {
             binding.encryptedMessage.visibility = View.GONE
 
             val promptInfo = createPromptInfo()
-
             if (initCipher(cipher, keyName)) {
                 biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
             }
@@ -270,8 +283,7 @@ class BiometricFragment : Fragment() {
 
     companion object {
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
-        private const val KEY_NAME_NOT_INVALIDATED = "key_not_invalidated"
-        private const val SECRET_MESSAGE = "Very secret message"
         private const val TAG = "MainActivity"
+        private const val DEFAULT_KEY_NAME = "default_key"
     }
 }
