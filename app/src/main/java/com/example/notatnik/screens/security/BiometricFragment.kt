@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties.*
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,13 +20,15 @@ import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.BiometricFragmentBinding
 import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
-import com.example.notatnik.screens.security.biometric.FingerprintAuthenticationDialogFragment
 import java.io.IOException
 import java.security.*
 import java.security.cert.CertificateException
-import javax.crypto.*
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.NoSuchPaddingException
+import javax.crypto.SecretKey
 
-class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Callback {
+class BiometricFragment : Fragment() {
 
     private lateinit var keyStore: KeyStore
     private lateinit var keyGenerator: KeyGenerator
@@ -81,8 +82,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
         if (BiometricManager.from(
                 application).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
-            createKey(DEFAULT_KEY_NAME)
-            createKey(KEY_NAME_NOT_INVALIDATED, false)
+            createKey(DEFAULT_KEY_NAME, true)
 
             authorizeButton.run {
                 isEnabled = true
@@ -161,46 +161,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
         }
     }
 
-    /**
-     * Proceed with the purchase operation
-     *
-     * @param withBiometrics `true` if the purchase was made by using a fingerprint
-     * @param crypto the Crypto object
-     */
-    override fun onAuthorize(withBiometrics: Boolean, crypto: BiometricPrompt.CryptoObject?) {
-        if (withBiometrics) {
-            // If the user authenticated with fingerprint, verify using cryptography and then show the confirmation message.
-            crypto?.cipher?.let { tryEncrypt(it) }
-        }
-    }
-
-    // Show confirmation message. Also show crypto information if fingerprint was used.
-    private fun showConfirmation(encrypted: ByteArray? = null) {
-        if (encrypted != null) {
-            binding.encryptedMessage.run {
-                visibility = View.VISIBLE
-                text = Base64.encodeToString(encrypted, 0)
-            }
-        }
-    }
-
-    /**
-     * Tries to encrypt some data with the generated key from [createKey]. This only works if the
-     * user just authenticated via fingerprint.
-     */
-    private fun tryEncrypt(cipher: Cipher) {
-        try {
-            showConfirmation(cipher.doFinal(SECRET_MESSAGE.toByteArray()))
-        } catch (e: Exception) {
-            when (e) {
-                is BadPaddingException,
-                is IllegalBlockSizeException -> {
-                    Log.e(TAG, "Failed to encrypt the data with the generated key. ${e.message}")
-                }
-                else -> throw e
-            }
-        }
-    }
 
     /**
      * Creates a symmetric key in the Android Key Store which can only be used after the user has
@@ -212,7 +172,7 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
      * be invalidated if a new fingerprint is enrolled.
      */
 
-    override fun createKey(keyName: String, invalidatedByBiometricEnrollment: Boolean) {
+    fun createKey(keyName: String, invalidatedByBiometricEnrollment: Boolean) {
         // The enrolling flow for fingerprint. This is where you ask the user to set up fingerprint
         // for your flow. Use of keys is necessary if you need to know if the set of enrolled
         // fingerprints has changed.
@@ -261,7 +221,6 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 Log.d(TAG, "Authentication was successful")
-                onAuthorize(true, result.cryptoObject)
                 startNavigate()
             }
         }
@@ -271,6 +230,8 @@ class BiometricFragment : Fragment(), FingerprintAuthenticationDialogFragment.Ca
 
     private fun startNavigate() {
         if(passwordBool){
+            keyStore.load(null)
+            val key = keyStore.getKey(DEFAULT_KEY_NAME, null) as SecretKey
             this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", false))
         }
         else{
