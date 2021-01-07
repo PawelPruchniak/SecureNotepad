@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.BiometricFragmentBinding
+import com.example.notatnik.screens.security.biometric.CipherSerializable
 import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
 import java.io.IOException
 import java.security.*
@@ -115,6 +116,7 @@ class BiometricFragment : Fragment() {
             }
         }
     }
+
 
     /**
      * Sets up default cipher
@@ -221,22 +223,21 @@ class BiometricFragment : Fragment() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 Log.d(TAG, "Authentication was successful")
-                startNavigate()
+                startNavigate(result.cryptoObject?.cipher)
             }
         }
 
         return BiometricPrompt(this, executor, callback)
     }
 
-    private fun startNavigate() {
+    private fun startNavigate(cipher: Cipher?) {
+        val cipherSerializable = CipherSerializable(cipher)
         if(passwordBool){
-            keyStore.load(null)
-            val key = keyStore.getKey(DEFAULT_KEY_NAME, null) as SecretKey
-            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", false))
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true, cipherSerializable))
         }
         else{
             binding.viewModel!!.passwordCreated()
-            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true))
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true, cipherSerializable))
         }
     }
 

@@ -30,7 +30,7 @@ class NotesFragment : Fragment() {
 
         val arguments =  NotesFragmentArgs.fromBundle(requireArguments())
 
-        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg, arguments.status)
+        val viewModelFactory = NotesViewModelFactory(dataSource, application, arguments.passwordArg, arguments.status, arguments.cipher)
         val notesViewModel = ViewModelProvider(this, viewModelFactory).get(
             NotesViewModel::class.java
         )
@@ -55,7 +55,7 @@ class NotesFragment : Fragment() {
         // Event obserwujący zmienną w której są zaszyfrowane dane
         notesViewModel.noteDatabase.observe(viewLifecycleOwner, { note ->
             if(note != null){
-                notesViewModel.initializeNote()
+                //notesViewModel.initializeNote()
                 println("The noteEncrypted was successfully loaded")
             }
             else{

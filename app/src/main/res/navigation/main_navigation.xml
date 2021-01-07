@@ -20,6 +20,9 @@
         <argument
             android:name="status"
             app:argType="boolean" />
+        <argument
+            android:name="cipher"
+            app:argType="com.example.notatnik.screens.security.biometric.CipherSerializable" />
     </fragment>
     <fragment
         android:id="@+id/securityFragment"

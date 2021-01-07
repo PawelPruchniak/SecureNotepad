@@ -1,6 +1,7 @@
 package com.example.notatnik.screens.notes
 
 import android.app.Application
+import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -10,14 +11,18 @@ import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Notes
 import com.example.notatnik.database.NotesDatabaseDao
 import com.example.notatnik.screens.security.Encryption
+import com.example.notatnik.screens.security.biometric.CipherSerializable
 import kotlinx.coroutines.*
-import java.util.*
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
 
 class NotesViewModel(
         private val database: NotesDatabaseDao,
         application: Application,
         private val password: String,
-        status: Boolean
+        status: Boolean,
+        cipherSerializable: CipherSerializable
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych
@@ -36,10 +41,14 @@ class NotesViewModel(
     val eventSaveButtonClicked: LiveData<Boolean>
         get() = _eventSaveButtonClicked
 
+    private lateinit var cipher: Cipher
+    private lateinit var keyStore: KeyStore
 
     init {
         _noteString.value = "loading..."
         noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
+
+        cipher = cipherSerializable.cipher
         if(status){
             initializeNewPassword()
         }
@@ -47,27 +56,30 @@ class NotesViewModel(
 
      fun initializeNote() {
         val base64Encrypted = noteDatabase.value?.noteEncrypted
-        val base64Salt = noteDatabase.value?.noteSalt
-        val base64Iv  = noteDatabase.value?.noteIv
 
         val encrypted = Base64.decode(base64Encrypted, Base64.NO_WRAP)
-        val iv = Base64.decode(base64Iv, Base64.NO_WRAP)
-        val salt = Base64.decode(base64Salt, Base64.NO_WRAP)
 
         val dataEncrypted = HashMap<String, ByteArray>()
-         dataEncrypted["salt"] = salt
-         dataEncrypted["iv"] = iv
-         dataEncrypted["encrypted"] = encrypted
+        dataEncrypted["encrypted"] = encrypted
 
         decryptNote(dataEncrypted)
     }
 
      private fun initializeNewPassword() {
         val note = "Enter your notes here"
+         val dataEncrypted = HashMap<String, ByteArray>()
+         val cipherString = "${KeyProperties.KEY_ALGORITHM_AES}/${KeyProperties.BLOCK_MODE_CBC}/${KeyProperties.ENCRYPTION_PADDING_PKCS7}"
+         val cipher2 = Cipher.getInstance(cipherString)
+         keyStore = KeyStore.getInstance("AndroidKeyStore")
+         keyStore.load(null)
+         cipher2.init(Cipher.ENCRYPT_MODE, keyStore.getKey("default_key", null) as SecretKey)
+         dataEncrypted["encrypted"]  = cipher2.doFinal(note.toByteArray(Charsets.UTF_8))
+         println(dataEncrypted)
+         println(dataEncrypted)
+         println(dataEncrypted)
+         println(dataEncrypted)
 
-        val dataEncrypted = Encryption().encrypt(note.toByteArray(Charsets.UTF_8), password.toCharArray())
-        saveDataToNoteDatabase(dataEncrypted)
-        decryptNote(dataEncrypted)
+         saveDataToNoteDatabase(dataEncrypted)
     }
 
     private fun saveDataToNoteDatabase(map: HashMap<String, ByteArray>) {
@@ -76,11 +88,6 @@ class NotesViewModel(
                 val newNote = Notes()
 
                 val encryptedBase64String = Base64.encodeToString(map["encrypted"], Base64.NO_WRAP)
-                val saltBase64String = Base64.encodeToString(map["salt"], Base64.NO_WRAP)
-                val ivBase64String = Base64.encodeToString(map["iv"], Base64.NO_WRAP)
-
-                newNote.noteSalt = saltBase64String
-                newNote.noteIv = ivBase64String
                 newNote.noteEncrypted = encryptedBase64String
 
                 if (noteDatabase.value == null){
