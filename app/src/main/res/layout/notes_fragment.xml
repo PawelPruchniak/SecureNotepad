@@ -28,19 +28,18 @@
                 android:layout_marginEnd="16dp"
                 android:imeOptions="actionDone"
                 android:text="@{String.valueOf(viewModel.noteString)}"
-                app:layout_constraintBottom_toTopOf="@+id/save_note_btn"
+                app:layout_constraintBottom_toTopOf="@+id/saveButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/save_note_btn"
+                android:id="@+id/saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="64dp"
                 android:layout_marginEnd="16dp"
-                android:onClick="@{() -> viewModel.onSaveButtonClicked()}"
                 android:text="@string/save_note_btn_string"
                 android:theme="@style/Widget.Notatnik.Button"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,6 +48,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/note_textView" />
 
+            <Button
+                android:id="@+id/decryptButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:text="Decrypt"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/saveButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/note_textView" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

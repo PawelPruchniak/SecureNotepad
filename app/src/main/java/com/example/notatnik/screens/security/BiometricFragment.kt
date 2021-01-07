@@ -233,11 +233,11 @@ class BiometricFragment : Fragment() {
     private fun startNavigate(cipher: Cipher?) {
         val cipherSerializable = CipherSerializable(cipher)
         if(passwordBool){
-            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true, cipherSerializable))
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment(false))
         }
         else{
             binding.viewModel!!.passwordCreated()
-            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment("fwa92q.gwalg23ga32kga22a1!y1gsa23332hSaw", true, cipherSerializable))
+            this.findNavController().navigate(BiometricFragmentDirections.actionBiometricFragmentToNotesFragment(true))
         }
     }
 
