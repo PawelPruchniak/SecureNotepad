@@ -9,13 +9,14 @@ import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Notes
 import com.example.notatnik.database.NotesDatabaseDao
 import kotlinx.coroutines.*
+import java.nio.charset.Charset
 import java.security.KeyStore
 import javax.crypto.Cipher
 
 class NotesViewModel(
         private val database: NotesDatabaseDao,
         application: Application,
-        status: Boolean
+        private val status: Boolean
 ) : AndroidViewModel(application) {
 
     // zmienne do porozumiewania się z bazą danych
@@ -43,8 +44,19 @@ class NotesViewModel(
     }
 
      fun initializeNote() {
+
         val base64Encrypted = noteDatabase.value?.noteEncrypted
          _noteString.value = base64Encrypted
+         val iv = noteDatabase.value?.noteIv
+         println("iv z bazy danych string to: $iv")
+         if(iv == null){
+
+         }
+         else{
+             val encrypted = iv.toByteArray()
+             println("iv z bazy danych to: $encrypted")
+         }
+
     }
 
      private fun initializeNewPassword() {
@@ -60,7 +72,10 @@ class NotesViewModel(
 
                 newNote.noteEncrypted = note
                 if(iv.size == 12){
-                    newNote.noteIv = iv
+                    println("ZAPISUJE IV: $iv")
+                    val ivS = String(iv, Charsets.UTF_8)
+                    println("zapisuje iv string : $ivS")
+                    newNote.noteIv = ivS
                 }
 
                 if (noteDatabase.value == null){
@@ -75,8 +90,23 @@ class NotesViewModel(
         Log.i("NotesViewModel", "Note was added to database!")
     }
 
+    fun tryToLoadIV(): ByteArray {
+        noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
+        val base64Iv  = noteDatabase.value?.noteIv
+        val iv = base64Iv!!.toByteArray(Charset.forName("UTF-8"))
+        return  iv
+    }
+
+    fun tryToLoadCipherText(): ByteArray {
+        val base64Encrypted = noteDatabase.value?.noteEncrypted
+        val encrypted = base64Encrypted!!.toByteArray(Charset.forName("UTF-8"))
+        return  encrypted
+    }
+
     fun saveEncryptedNote(note: String, iv: ByteArray){
-        saveDataToNoteDatabase(note)
+        println("iv do zapisania :$iv")
+        println("iv dlugosc do zapisania :${iv.size}")
+        saveDataToNoteDatabase(note, iv)
         println("Note added to be saved in database!")
     }
 
@@ -85,6 +115,7 @@ class NotesViewModel(
         viewModelJob.cancel()
         Log.i("NotesViewModel", "NotesViewModel destroyed!")
     }
+
 
 }
 

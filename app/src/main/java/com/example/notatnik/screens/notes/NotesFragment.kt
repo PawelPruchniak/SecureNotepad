@@ -20,6 +20,7 @@ import com.example.notatnik.database.NotesDatabase
 import com.example.notatnik.databinding.NotesFragmentBinding
 import java.nio.charset.Charset
 
+
 class NotesFragment : Fragment() {
 
     private lateinit var binding : NotesFragmentBinding
@@ -32,6 +33,7 @@ class NotesFragment : Fragment() {
     private lateinit var secretKeyName: String
     private lateinit var ciphertext:ByteArray
     private lateinit var initializationVector: ByteArray
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,8 +55,6 @@ class NotesFragment : Fragment() {
         binding.viewModel = notesViewModel
         binding.lifecycleOwner = this
 
-        initializationVector = "".toByteArray()
-
         binding.saveButton.setOnClickListener { authenticateToEncrypt() }
         binding.decryptButton.setOnClickListener { authenticateToDecrypt() }
 
@@ -66,11 +66,10 @@ class NotesFragment : Fragment() {
 
         // Event obserwujący zmienną w której są zaszyfrowane dane
         notesViewModel.noteDatabase.observe(viewLifecycleOwner, { note ->
-            if(note != null){
+            if (note != null) {
                 notesViewModel.initializeNote()
                 println("The noteEncrypted was successfully loaded")
-            }
-            else{
+            } else {
                 println("Note is null")
             }
         })
@@ -125,6 +124,8 @@ class NotesFragment : Fragment() {
 
             String(ciphertext, Charset.forName("UTF-8"))
         } else {
+            ciphertext = binding.viewModel!!.tryToLoadCipherText()
+            println("wczytuje ciphertext: $ciphertext")
             cryptographyManager.decryptData(ciphertext, cryptoObject?.cipher!!)
         }
         binding.viewModel?.saveEncryptedNote(data, initializationVector)
@@ -143,11 +144,17 @@ class NotesFragment : Fragment() {
     private fun authenticateToDecrypt() {
         println("ENTERED HERE de")
         readyToEncrypt = false
+        initializationVector = binding.viewModel!!.tryToLoadIV()
+        println("wczytuje iv : $initializationVector")
+        println("iv size : ${initializationVector.size}")
         if (initializationVector.size == 12) {
             println("ENTERED HERE de2")
             if (BiometricManager.from(application).canAuthenticate() == BiometricManager
                     .BIOMETRIC_SUCCESS) {
-                val cipher = cryptographyManager.getInitializedCipherForDecryption(secretKeyName, initializationVector)
+                val cipher = cryptographyManager.getInitializedCipherForDecryption(
+                    secretKeyName,
+                    initializationVector
+                )
                 biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
             }
         }

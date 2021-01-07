@@ -58,7 +58,7 @@ class PasswordChangeViewModel(
                 val ivBase64String = Base64.encodeToString(map["iv"], Base64.NO_WRAP)
 
                 newNote.noteSalt = saltBase64String
-                newNote.noteIv = ivBase64String
+                //newNote.noteIv = ivBase64String
                 newNote.noteEncrypted = encryptedBase64String
 
                 if (noteDatabase.value == null){
