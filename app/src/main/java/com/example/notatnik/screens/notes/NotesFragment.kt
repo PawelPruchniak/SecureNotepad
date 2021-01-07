@@ -118,7 +118,6 @@ class NotesFragment : Fragment() {
             }
         }
 
-        //The API requires the client/Activity context for displaying the prompt view
         val biometricPrompt = BiometricPrompt(this, executor, callback)
         return biometricPrompt
     }
@@ -129,9 +128,6 @@ class NotesFragment : Fragment() {
             .setDescription(getString(R.string.prompt_info_description))
             .setConfirmationRequired(false)
             .setNegativeButtonText(getString(R.string.prompt_info_use_app_password))
-            //.setDeviceCredentialAllowed(true) // Allow PIN/pattern/password authentication.
-            // Also note that setDeviceCredentialAllowed and setNegativeButtonText are
-            // incompatible so that if you uncomment one you must comment out the other
             .build()
         return promptInfo
     }
