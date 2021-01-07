@@ -53,9 +53,9 @@ class NotesViewModel(
     }
 
      private fun initializeNewPassword() {
-        val note = "Enter your notes here"
+        val note = ""
          _noteString.value = note
-         saveDataToNoteDatabase(Base64.decode(note, Base64.NO_WRAP), "".toByteArray())
+         saveDataToNoteDatabase(Base64.decode(note, Base64.DEFAULT), "".toByteArray())
     }
 
     private fun saveDataToNoteDatabase(note: ByteArray, iv: ByteArray) {
