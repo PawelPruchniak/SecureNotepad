@@ -2,7 +2,7 @@
     <string name="app_name">Notatnik</string>
     <string name="login_btn_string">Login</string>
     <string name="login_txt_string">Enter you password:</string>
-    <string name="save_note_btn_string">Save</string>
+    <string name="save_note_btn_string">Save and encrypt</string>
     <string name="second_password_string">Repeat password:</string>
     <string name="first_password_string">Enter Password:</string>
     <string name="info_txt_string">Create your password!</string>
