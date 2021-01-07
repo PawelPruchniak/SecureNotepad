@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.notatnik.database.NotesDatabaseDao
-import com.example.notatnik.screens.security.biometric.CipherSerializable
 
 class NotesViewModelFactory(
         private val dataSource: NotesDatabaseDao,
