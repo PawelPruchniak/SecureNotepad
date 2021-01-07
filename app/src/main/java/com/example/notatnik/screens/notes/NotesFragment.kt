@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -78,9 +77,6 @@ class NotesFragment : Fragment() {
         notesViewModel.databaseIV.observe(viewLifecycleOwner, { iv ->
             if(iv != null){
                 initializationVector = iv
-                val ivString = Base64.encodeToString(iv, Base64.DEFAULT)
-                println("iv from database: $iv")
-                println("iv from database, string:  $ivString")
                 println("The IV was successfully loaded")
             }
             else{
@@ -91,10 +87,6 @@ class NotesFragment : Fragment() {
         notesViewModel.databaseNote.observe(viewLifecycleOwner, { text ->
             if(text != null){
                 ciphertext = text
-                val ciphertextString = Base64.encodeToString(text, Base64.DEFAULT)
-                println("cipherText from database: $text")
-                println("cipherText from database, string: $ciphertextString")
-
                 println("The cipherText was successfully loaded")
             }
             else{
@@ -150,7 +142,6 @@ class NotesFragment : Fragment() {
             val encryptedData = cryptographyManager.encryptData(text, cryptoObject?.cipher!!)
             ciphertext = encryptedData.ciphertext
             initializationVector = encryptedData.initializationVector
-            println("Starting to Encrypt with iv: $initializationVector, and cipherText: $ciphertext")
             binding.viewModel?.saveEncryptedNote(ciphertext, initializationVector)
         } else {
             binding.viewModel?.showDecryptedNote(cryptographyManager.decryptData(ciphertext, cryptoObject?.cipher!!))
@@ -161,20 +152,19 @@ class NotesFragment : Fragment() {
         readyToEncrypt = true
         if (BiometricManager.from(application).canAuthenticate() == BiometricManager
                 .BIOMETRIC_SUCCESS) {
-            println("Starting to Encrypt")
             val cipher = cryptographyManager.getInitializedCipherForEncryption(secretKeyName)
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
     }
 
     private fun authenticateToDecrypt() {
-        println("ENTERED HERE de")
         readyToEncrypt = false
-        println("Starting to decrypt, with iv: $initializationVector, and ciphertext: $ciphertext")
-        if (BiometricManager.from(application).canAuthenticate() == BiometricManager
-                .BIOMETRIC_SUCCESS) {
-            val cipher = cryptographyManager.getInitializedCipherForDecryption(secretKeyName, initializationVector)
-            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+        if(initializationVector.size != 0){
+            if (BiometricManager.from(application).canAuthenticate() == BiometricManager
+                            .BIOMETRIC_SUCCESS) {
+                val cipher = cryptographyManager.getInitializedCipherForDecryption(secretKeyName, initializationVector)
+                biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+            }
         }
     }
 

@@ -39,7 +39,6 @@ class NotesViewModel(
     init {
         _noteString.value = "loading..."
         noteDatabase.addSource(database.getLastNote(), noteDatabase::setValue)
-
         if(status){
             initializeNewPassword()
         }
@@ -56,7 +55,7 @@ class NotesViewModel(
      private fun initializeNewPassword() {
         val note = "Enter your notes here"
          _noteString.value = note
-         saveDataToNoteDatabase(note.toByteArray(), "".toByteArray())
+         saveDataToNoteDatabase(Base64.decode(note, Base64.NO_WRAP), "".toByteArray())
     }
 
     private fun saveDataToNoteDatabase(note: ByteArray, iv: ByteArray) {
@@ -64,15 +63,10 @@ class NotesViewModel(
             withContext(Dispatchers.IO){
                 val newNote = Notes()
 
-                println("zapisywanie do bazy danych, cipherText: $note")
-                println("zapisywanie do bazy danych, iv: $iv")
-
                 val note64 = Base64.encodeToString(note, Base64.DEFAULT)
-                val iv64 = Base64.encodeToString(note, Base64.DEFAULT)
+                val iv64 = Base64.encodeToString(iv, Base64.DEFAULT)
 
-                println("zapisywanie do bazy danych, cipherText string: $note64")
-                println("zapisywanie do bazy danych, iv string: $iv64")
-
+                println("zapisuję notatkę: $note64")
                 newNote.noteEncrypted = note64
                 newNote.noteIv = iv64
 
@@ -90,7 +84,6 @@ class NotesViewModel(
 
     fun saveEncryptedNote(note: ByteArray, iv: ByteArray){
         saveDataToNoteDatabase(note, iv)
-        println("Note added to be saved in database!")
     }
 
     fun showDecryptedNote(note: String){
