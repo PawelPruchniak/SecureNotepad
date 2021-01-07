@@ -19,7 +19,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.BiometricFragmentBinding
-import com.example.notatnik.screens.security.biometric.DEFAULT_KEY_NAME
 import java.io.IOException
 import java.security.*
 import java.security.cert.CertificateException
@@ -89,11 +88,11 @@ class BiometricFragment : Fragment() {
 
         if (BiometricManager.from(
                 application).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
-            createKey(DEFAULT_KEY_NAME, true)
+            createKey("default_key")
 
             authorizeButton.run {
                 isEnabled = true
-                setOnClickListener(PurchaseButtonClickListener(defaultCipher, DEFAULT_KEY_NAME))
+                setOnClickListener(PurchaseButtonClickListener(defaultCipher, "default_key"))
             }
         } else {
             print(getString(R.string.setup_lock_screen))
@@ -173,9 +172,9 @@ class BiometricFragment : Fragment() {
      * Funkcja tworząca symetryczny klucz w Android Key Store, który może być użyty tylko po
      * uwierzytelnieniu przez odcisk palca użytkownika
      *
-     * @param keyName nazwa klucza który zostanie stworzony w tym wypadku DEFAULT_KEY_NAME
+     * @param keyName nazwa klucza który zostanie stworzony w tym wypadku "default_key"
      */
-    fun createKey(keyName: String, invalidatedByBiometricEnrollment: Boolean) {
+    fun createKey(keyName: String) {
         try {
             keyStore.load(null)
 
@@ -184,7 +183,6 @@ class BiometricFragment : Fragment() {
                 .setBlockModes(BLOCK_MODE_CBC)
                 .setUserAuthenticationRequired(true)
                 .setEncryptionPaddings(ENCRYPTION_PADDING_PKCS7)
-                .setInvalidatedByBiometricEnrollment(invalidatedByBiometricEnrollment)
 
             keyGenerator.run {
                 init(builder.build())
