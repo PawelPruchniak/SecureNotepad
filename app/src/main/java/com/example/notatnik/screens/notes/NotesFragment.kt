@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.notatnik.R
 import com.example.notatnik.database.NotesDatabase
 import com.example.notatnik.databinding.NotesFragmentBinding
-import java.nio.charset.Charset
 
 class NotesFragment : Fragment() {
 
@@ -74,7 +74,35 @@ class NotesFragment : Fragment() {
                 println("Note is null")
             }
         })
+
+        notesViewModel.databaseIV.observe(viewLifecycleOwner, { iv ->
+            if(iv != null){
+                initializationVector = iv
+                val ivString = Base64.encodeToString(iv, Base64.DEFAULT)
+                println("iv from database: $iv")
+                println("iv from database, string:  $ivString")
+                println("The IV was successfully loaded")
+            }
+            else{
+                println("IV is null")
+            }
+        })
+
+        notesViewModel.databaseNote.observe(viewLifecycleOwner, { text ->
+            if(text != null){
+                ciphertext = text
+                val ciphertextString = Base64.encodeToString(text, Base64.DEFAULT)
+                println("cipherText from database: $text")
+                println("cipherText from database, string: $ciphertextString")
+
+                println("The cipherText was successfully loaded")
+            }
+            else{
+                println("cipherText is null")
+            }
+        })
         return binding.root
+
     }
 
     private fun createBiometricPrompt(): BiometricPrompt {
@@ -117,24 +145,23 @@ class NotesFragment : Fragment() {
     }
 
     private fun processData(cryptoObject: BiometricPrompt.CryptoObject?) {
-        val data = if (readyToEncrypt) {
+        if (readyToEncrypt) {
             val text = binding.noteTextView.text.toString()
             val encryptedData = cryptographyManager.encryptData(text, cryptoObject?.cipher!!)
             ciphertext = encryptedData.ciphertext
             initializationVector = encryptedData.initializationVector
-
-            String(ciphertext, Charset.forName("UTF-8"))
+            println("Starting to Encrypt with iv: $initializationVector, and cipherText: $ciphertext")
+            binding.viewModel?.saveEncryptedNote(ciphertext, initializationVector)
         } else {
-            cryptographyManager.decryptData(ciphertext, cryptoObject?.cipher!!)
+            binding.viewModel?.showDecryptedNote(cryptographyManager.decryptData(ciphertext, cryptoObject?.cipher!!))
         }
-        binding.viewModel?.saveEncryptedNote(data, initializationVector)
     }
 
     private fun authenticateToEncrypt() {
-        println("ENTERED HERE")
         readyToEncrypt = true
         if (BiometricManager.from(application).canAuthenticate() == BiometricManager
                 .BIOMETRIC_SUCCESS) {
+            println("Starting to Encrypt")
             val cipher = cryptographyManager.getInitializedCipherForEncryption(secretKeyName)
             biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
@@ -143,13 +170,11 @@ class NotesFragment : Fragment() {
     private fun authenticateToDecrypt() {
         println("ENTERED HERE de")
         readyToEncrypt = false
-        if (initializationVector.size == 12) {
-            println("ENTERED HERE de2")
-            if (BiometricManager.from(application).canAuthenticate() == BiometricManager
-                    .BIOMETRIC_SUCCESS) {
-                val cipher = cryptographyManager.getInitializedCipherForDecryption(secretKeyName, initializationVector)
-                biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
-            }
+        println("Starting to decrypt, with iv: $initializationVector, and ciphertext: $ciphertext")
+        if (BiometricManager.from(application).canAuthenticate() == BiometricManager
+                .BIOMETRIC_SUCCESS) {
+            val cipher = cryptographyManager.getInitializedCipherForDecryption(secretKeyName, initializationVector)
+            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
     }
 

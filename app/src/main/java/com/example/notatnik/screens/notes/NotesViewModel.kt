@@ -1,6 +1,7 @@
 package com.example.notatnik.screens.notes
 
 import android.app.Application
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -9,8 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Notes
 import com.example.notatnik.database.NotesDatabaseDao
 import kotlinx.coroutines.*
-import java.security.KeyStore
-import javax.crypto.Cipher
 
 class NotesViewModel(
         private val database: NotesDatabaseDao,
@@ -29,9 +28,13 @@ class NotesViewModel(
     val noteString: LiveData<String>
         get() = _noteString
 
+    private val _databaseIV = MutableLiveData<ByteArray>()
+    val databaseIV: LiveData<ByteArray>
+        get() = _databaseIV
 
-    private lateinit var cipher: Cipher
-    private lateinit var keyStore: KeyStore
+    private val _databaseNote = MutableLiveData<ByteArray>()
+    val databaseNote: LiveData<ByteArray>
+        get() = _databaseNote
 
     init {
         _noteString.value = "loading..."
@@ -44,24 +47,34 @@ class NotesViewModel(
 
      fun initializeNote() {
         val base64Encrypted = noteDatabase.value?.noteEncrypted
+        val iv = noteDatabase.value?.noteIv
          _noteString.value = base64Encrypted
+         _databaseNote.value = Base64.decode(base64Encrypted, Base64.DEFAULT)
+         _databaseIV.value = Base64.decode(iv, Base64.DEFAULT)
     }
 
      private fun initializeNewPassword() {
         val note = "Enter your notes here"
          _noteString.value = note
-         saveDataToNoteDatabase(note, "".toByteArray())
+         saveDataToNoteDatabase(note.toByteArray(), "".toByteArray())
     }
 
-    private fun saveDataToNoteDatabase(note: String, iv: ByteArray) {
+    private fun saveDataToNoteDatabase(note: ByteArray, iv: ByteArray) {
         uiScope.launch {
             withContext(Dispatchers.IO){
                 val newNote = Notes()
 
-                newNote.noteEncrypted = note
-                if(iv.size == 12){
-                    newNote.noteIv = iv
-                }
+                println("zapisywanie do bazy danych, cipherText: $note")
+                println("zapisywanie do bazy danych, iv: $iv")
+
+                val note64 = Base64.encodeToString(note, Base64.DEFAULT)
+                val iv64 = Base64.encodeToString(note, Base64.DEFAULT)
+
+                println("zapisywanie do bazy danych, cipherText string: $note64")
+                println("zapisywanie do bazy danych, iv string: $iv64")
+
+                newNote.noteEncrypted = note64
+                newNote.noteIv = iv64
 
                 if (noteDatabase.value == null){
                     database.insert(newNote)
@@ -75,9 +88,13 @@ class NotesViewModel(
         Log.i("NotesViewModel", "Note was added to database!")
     }
 
-    fun saveEncryptedNote(note: String, iv: ByteArray){
-        saveDataToNoteDatabase(note)
+    fun saveEncryptedNote(note: ByteArray, iv: ByteArray){
+        saveDataToNoteDatabase(note, iv)
         println("Note added to be saved in database!")
+    }
+
+    fun showDecryptedNote(note: String){
+        _noteString.value = note
     }
 
     override fun onCleared() {
