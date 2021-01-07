@@ -24,8 +24,6 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-
-
 /**
  * Copyright (C) 2020 Google Inc. All Rights Reserved.
  *
@@ -41,29 +39,11 @@ import javax.crypto.spec.GCMParameterSpec
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 interface CryptographyManager {
 
-    /**
-     * This method first gets or generates an instance of SecretKey and then initializes the Cipher
-     * with the key. The secret key uses [ENCRYPT_MODE][Cipher.ENCRYPT_MODE] is used.
-     */
     fun getInitializedCipherForEncryption(keyName: String): Cipher
-
-    /**
-     * This method first gets or generates an instance of SecretKey and then initializes the Cipher
-     * with the key. The secret key uses [DECRYPT_MODE][Cipher.DECRYPT_MODE] is used.
-     */
     fun getInitializedCipherForDecryption(keyName: String, initializationVector: ByteArray): Cipher
-
-    /**
-     * The Cipher created with [getInitializedCipherForEncryption] is used here
-     */
     fun encryptData(plaintext: String, cipher: Cipher): EncryptedData
-
-    /**
-     * The Cipher created with [getInitializedCipherForDecryption] is used here
-     */
     fun decryptData(ciphertext: ByteArray, cipher: Cipher): String
 
 }
@@ -110,12 +90,10 @@ private class CryptographyManagerImpl : CryptographyManager {
     }
 
     private fun getOrCreateSecretKey(keyName: String): SecretKey {
-        // If Secretkey was previously created for that keyName, then grab and return it.
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
-        keyStore.load(null) // Keystore must be loaded before it can be accessed
+        keyStore.load(null)
         keyStore.getKey(keyName, null)?.let { return it as SecretKey }
 
-        // if you reach here, then a new SecretKey must be generated for that keyName
         val paramsBuilder = KeyGenParameterSpec.Builder(keyName,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
         paramsBuilder.apply {
