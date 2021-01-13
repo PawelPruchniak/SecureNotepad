@@ -40,7 +40,7 @@ class PasswordCreateViewModel(
 
     // Zmienna z hasłem z bazy danych
     var passwordExists = MediatorLiveData<BooleanPassword>()
-    private var password: String? = null
+    lateinit private var password: String
 
     init {
         // Pobieranie zmiennej z hasłem z bazy danych
@@ -67,7 +67,10 @@ class PasswordCreateViewModel(
         Log.i("PasswordCreateViewModel", "PasswordExists was added to database!")
     }
 
-    fun getPassword(): String? {
+    fun saveEncryptedPassword() {
+
+    }
+    fun getPassword(): String {
         return password
     }
 

@@ -1,12 +1,17 @@
 package com.example.notatnik.screens.security
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -14,9 +19,22 @@ import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.BooleanPasswordDatabase
 import com.example.notatnik.databinding.PasswrdCreateFragmentBinding
+import com.example.notatnik.screens.security.biometric.CryptographyManager
 
 // PasswordCreate, PasswordCreateViewModel, PasswordCreateViewModelFactory służą do STWORZENIA PIERWSZEGO HASŁA
 class PasswordCreate : Fragment() {
+
+    private lateinit var binding : PasswrdCreateFragmentBinding
+    private lateinit var application: Application
+
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    private var readyToEncrypt: Boolean = false
+    private lateinit var cryptographyManager: CryptographyManager
+    private lateinit var secretKeyName: String
+    private lateinit var ciphertext:ByteArray
+    private lateinit var initializationVector: ByteArray
+
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -24,10 +42,9 @@ class PasswordCreate : Fragment() {
     ): View {
 
         // Setting binding
-        val binding: PasswrdCreateFragmentBinding =
-                DataBindingUtil.inflate(inflater, R.layout.passwrd_create_fragment, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.passwrd_create_fragment, container, false)
 
-        val application = requireNotNull(this.activity).application
+        application = requireNotNull(this.activity).application
         val dataSource = BooleanPasswordDatabase.getInstance(application).passwordDatabaseDao
 
         val viewModelFactory = PasswordCreateViewModelFactory(dataSource, application)
@@ -36,6 +53,11 @@ class PasswordCreate : Fragment() {
         )
         binding.viewModel = securityViewModel
         binding.lifecycleOwner = this
+
+        cryptographyManager = CryptographyManager()
+        secretKeyName = "default_key_name"
+        biometricPrompt = createBiometricPrompt()
+        promptInfo = createPromptInfo()
 
         // Event navigujący do PasswordCheckFragment
         securityViewModel.navigateToPasswordCheckFragment.observe(viewLifecycleOwner, { isTrue ->
@@ -74,7 +96,7 @@ class PasswordCreate : Fragment() {
         // Event tworzący nowe hasło
         securityViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
-                startBiometric()
+                authenticateToEncrypt()
                 securityViewModel.onStartFingerprintEnrollmentComplete()
             }
         })
@@ -92,10 +114,56 @@ class PasswordCreate : Fragment() {
         return binding.root
     }
 
-    private fun startBiometric() {
-        TODO("Not yet implemented")
+    private fun createBiometricPrompt(): BiometricPrompt {
+        val executor = ContextCompat.getMainExecutor(context)
+
+        val callback = object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                Log.d("NotesFragment", "$errorCode :: $errString")
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                Log.d("NotesFragment", "Authentication failed for an unknown reason")
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                Log.d("NotesFragment", "Authentication was successful")
+
+                /** NEED TO START NAVIGATE **/
+            }
+        }
+
+        val biometricPrompt = BiometricPrompt(this, executor, callback)
+        return biometricPrompt
     }
 
+    private fun createPromptInfo(): BiometricPrompt.PromptInfo {
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.prompt_info_title))
+                .setDescription(getString(R.string.prompt_info_description))
+                .setConfirmationRequired(false)
+                .build()
+        return promptInfo
+    }
+
+    private fun authenticateToEncrypt() {
+        if (BiometricManager.from(application).canAuthenticate() == BiometricManager
+                        .BIOMETRIC_SUCCESS) {
+            val cipher = cryptographyManager.getInitializedCipherForEncryption(secretKeyName)
+            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
+        }
+    }
+
+    private fun processData(cryptoObject: BiometricPrompt.CryptoObject?) {
+            val text = binding.viewModel.getPassword()
+            val encryptedData = cryptographyManager.encryptData(text, cryptoObject?.cipher!!)
+            ciphertext = encryptedData.ciphertext
+            initializationVector = encryptedData.initializationVector
+            binding.viewModel?.saveEncryptedPassword(ciphertext, initializationVector)
+        }
 
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU
     private fun Fragment.hideKeyboard() {
