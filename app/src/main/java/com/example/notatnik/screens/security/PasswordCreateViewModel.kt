@@ -6,12 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.notatnik.database.Password
-import com.example.notatnik.database.PasswordDatabaseDao
+import com.example.notatnik.database.BooleanPassword
+import com.example.notatnik.database.BooleanPasswordDatabaseDao
 import kotlinx.coroutines.*
 
 class PasswordCreateViewModel(
-        val database: PasswordDatabaseDao,
+        val database: BooleanPasswordDatabaseDao,
         application: Application,
 ) : AndroidViewModel(application) {
 
@@ -33,13 +33,18 @@ class PasswordCreateViewModel(
     val newPasswordEvent: LiveData<Boolean>
         get() = _newPasswordEvent
 
+    // Event aktywowany przy tworzeniu hasła
+    private val _fingerprintEnrollment = MutableLiveData<Boolean>()
+    val fingerprintEnrollment: LiveData<Boolean>
+        get() = _fingerprintEnrollment
+
     // Zmienna z hasłem z bazy danych
-    var passwordExists = MediatorLiveData<Password>()
+    var passwordExists = MediatorLiveData<BooleanPassword>()
     private var password: String? = null
 
     init {
         // Pobieranie zmiennej z hasłem z bazy danych
-        passwordExists.addSource(database.getLastPassword(), passwordExists::setValue)
+        passwordExists.addSource(database.getLastBooleanPassword(), passwordExists::setValue)
     }
 
     fun passwordIsGood(password_1: String, password_2: String): Boolean{
@@ -54,7 +59,7 @@ class PasswordCreateViewModel(
     private fun updateDatabase(){
         uiScope.launch {
             withContext(Dispatchers.IO){
-                val passwordExists = Password()
+                val passwordExists = BooleanPassword()
                 passwordExists.passwordBool = true
                 database.insert(passwordExists)
             }
@@ -88,6 +93,14 @@ class PasswordCreateViewModel(
 
     fun onNavigateToNoteFragmentComplete(){
         _navigateToNoteFragment.value = false
+    }
+
+    fun startFingerprintEnrollment() {
+        _fingerprintEnrollment.value = true
+    }
+
+    fun onStartFingerprintEnrollmentComplete() {
+        _fingerprintEnrollment.value = false
     }
 
 

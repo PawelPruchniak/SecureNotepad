@@ -8,30 +8,30 @@ import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [Password::class], version = 1, exportSchema = false)
-abstract class PasswordDatabase : RoomDatabase() {
+@Database(entities = [BooleanPassword::class], version = 5, exportSchema = false)
+abstract class BooleanPasswordDatabase : RoomDatabase() {
 
-    abstract val passwordDatabaseDao: PasswordDatabaseDao
+    abstract val passwordDatabaseDao: BooleanPasswordDatabaseDao
 
     companion object {
         @Volatile
-        private var passwordDatabaseSecure: PasswordDatabase? = null
+        private var booleanPasswordDatabaseSecure: BooleanPasswordDatabase? = null
 
-        fun getInstance(context: Context): PasswordDatabase {
-            return passwordDatabaseSecure ?: synchronized(this) {
-                passwordDatabaseSecure ?: buildDatabase(context).also {
-                    passwordDatabaseSecure = it
+        fun getInstance(context: Context): BooleanPasswordDatabase {
+            return booleanPasswordDatabaseSecure ?: synchronized(this) {
+                booleanPasswordDatabaseSecure ?: buildDatabase(context).also {
+                    booleanPasswordDatabaseSecure = it
                 }
             }
         }
 
-        private fun buildDatabase(context: Context):  PasswordDatabase {
-            val dbname = "password_database_secure"
+        private fun buildDatabase(context: Context):  BooleanPasswordDatabase {
+            val dbname = "booleanPassword_database_secure"
             val builder = Room.databaseBuilder(
                     context.applicationContext,
-                    PasswordDatabase::class.java, "${dbname}.db"
+                    BooleanPasswordDatabase::class.java, "${dbname}.db"
             )
-            val passphrase: ByteArray = SQLiteDatabase.getBytes("P@s5P4ras3Verge12331ws43wg!1Zsf1f1".toCharArray())
+            val passphrase: ByteArray = SQLiteDatabase.getBytes("P@s5P4ras3VeryL0n9forPaaS1g1wo7rd".toCharArray())
             val factory = SupportFactory(passphrase, object : SQLiteDatabaseHook {
                 override fun preKey(database: SQLiteDatabase?) = Unit
                 override fun postKey(database: SQLiteDatabase?) {

@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
-import com.example.notatnik.database.PasswordDatabase
+import com.example.notatnik.database.BooleanPasswordDatabase
 import com.example.notatnik.databinding.PasswrdCreateFragmentBinding
 
 // PasswordCreate, PasswordCreateViewModel, PasswordCreateViewModelFactory służą do STWORZENIA PIERWSZEGO HASŁA
@@ -28,7 +28,7 @@ class PasswordCreate : Fragment() {
                 DataBindingUtil.inflate(inflater, R.layout.passwrd_create_fragment, container, false)
 
         val application = requireNotNull(this.activity).application
-        val dataSource = PasswordDatabase.getInstance(application).passwordDatabaseDao
+        val dataSource = BooleanPasswordDatabase.getInstance(application).passwordDatabaseDao
 
         val viewModelFactory = PasswordCreateViewModelFactory(dataSource, application)
         val securityViewModel = ViewModelProvider(this, viewModelFactory).get(
@@ -62,7 +62,7 @@ class PasswordCreate : Fragment() {
             if (isTrue) {
                 hideKeyboard()
                 if(securityViewModel.passwordIsGood(binding.Password1.text.toString(), binding.Password2.text.toString() )){
-                    securityViewModel.navigateToNoteFragment()
+                    securityViewModel.startFingerprintEnrollment()
                 }
                 else{
                     binding.errorTxt.text = getString(R.string.password_dont_match_string)
@@ -71,7 +71,15 @@ class PasswordCreate : Fragment() {
             }
         })
 
-        // Event sprawdzający czy hasło zostało już stworzone, jeżeeli tak to naviguje
+        // Event tworzący nowe hasło
+        securityViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
+            if (isTrue) {
+                startBiometric()
+                securityViewModel.onStartFingerprintEnrollmentComplete()
+            }
+        })
+
+        // Event sprawdzający czy hasło zostało już stworzone, jeżeli tak to naviguje
         securityViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
             if(password != null && password.passwordBool){
                 securityViewModel.navigateToPasswordCheckFragment()
@@ -82,6 +90,10 @@ class PasswordCreate : Fragment() {
         })
 
         return binding.root
+    }
+
+    private fun startBiometric() {
+        TODO("Not yet implemented")
     }
 
 

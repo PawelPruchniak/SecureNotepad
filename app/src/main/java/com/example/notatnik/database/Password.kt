@@ -7,10 +7,12 @@ import androidx.room.PrimaryKey
 @Entity(tableName="password_database")
 data class Password(
 
-    @PrimaryKey(autoGenerate = true)
-    var passwordId: Long = 0L,
+        @PrimaryKey(autoGenerate = true)
+        var passwordId: Long = 0L,
 
-    @ColumnInfo(name = "password")
-    var passwordBool: Boolean = false
+        @ColumnInfo(name = "passwordIv")
+        var passwordIv: String? = null,
 
+        @ColumnInfo(name = "passwordEncrypted")
+        var passwordEncrypted: String? = null
 )

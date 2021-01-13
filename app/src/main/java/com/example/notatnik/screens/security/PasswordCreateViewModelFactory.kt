@@ -3,10 +3,10 @@ package com.example.notatnik.screens.security
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.notatnik.database.PasswordDatabaseDao
+import com.example.notatnik.database.BooleanPasswordDatabaseDao
 
 class PasswordCreateViewModelFactory(
-        private val dataSource: PasswordDatabaseDao,
+        private val dataSource: BooleanPasswordDatabaseDao,
         private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
