@@ -71,22 +71,17 @@ class PasswordCreateViewModel(
     }
 
     fun saveEncryptedPassword(password: ByteArray, iv: ByteArray) {
-        println("JESTEM TU 1")
         uiScope.launch {
             withContext(Dispatchers.IO){
-                println("JESTEM TU 2")
                 val newPassword = Password()
 
                 val password64 = Base64.encodeToString(password, Base64.DEFAULT)
                 val iv64 = Base64.encodeToString(iv, Base64.DEFAULT)
 
-                println("password: $password")
-                println("iv: $iv")
                 newPassword.passwordEncrypted = password64
                 newPassword.passwordIv = iv64
 
                 databasePassword.insert(newPassword)
-                println("JESTEM TU 3")
             }
         }
         Log.i("PasswordCreateViewModel", "Password was added to passwordDatabase!")

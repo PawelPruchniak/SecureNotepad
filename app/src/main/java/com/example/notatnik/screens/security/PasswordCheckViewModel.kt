@@ -62,7 +62,6 @@ class PasswordCheckViewModel(
     // Funkcja sprawdzająca poprawność wpisanego hasła
     fun checkPassword(password: String): Boolean {
 
-        println("HASŁO ROZSZYFROWANE: $password")
         val base64Encrypted = note.value?.noteEncrypted
         val base64Salt = note.value?.noteSalt
         val base64Iv  = note.value?.noteIv

@@ -164,8 +164,6 @@ class PasswordCreate : Fragment() {
             val encryptedData = cryptographyManager.encryptData(text, cryptoObject?.cipher!!)
             ciphertext = encryptedData.ciphertext
             initializationVector = encryptedData.initializationVector
-            println("ciphertext: $ciphertext")
-            println("iv: $initializationVector")
             binding.viewModel!!.saveEncryptedPassword(ciphertext, initializationVector)
             binding.viewModel!!.navigateToNoteFragment()
         }
