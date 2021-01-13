@@ -72,7 +72,7 @@ class PasswordCreate : Fragment() {
 
         securityViewModel.navigateToNoteFragment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
-                val createdPassword: String = securityViewModel.getPassword().toString()
+                val createdPassword: String = securityViewModel.getPassword()
                 this.findNavController().navigate(
                         PasswordCreateDirections.actionSecurityFragmentToNotesFragment(createdPassword, true)
                 )
@@ -95,7 +95,7 @@ class PasswordCreate : Fragment() {
         })
 
         // Event tworzący nowe hasło
-        securityViewModel.newPasswordEvent.observe(viewLifecycleOwner, { isTrue ->
+        securityViewModel.fingerprintEnrollment.observe(viewLifecycleOwner, { isTrue ->
             if (isTrue) {
                 authenticateToEncrypt()
                 securityViewModel.onStartFingerprintEnrollmentComplete()
@@ -106,9 +106,10 @@ class PasswordCreate : Fragment() {
         securityViewModel.passwordExists.observe(viewLifecycleOwner, { password ->
             if(password != null && password.passwordBool){
                 securityViewModel.navigateToPasswordCheckFragment()
+                println("PasswordCreateFragment: Hasło zostało juz stworzone!")
             }
             else{
-                println("Password jest null!")
+                println("PasswordCreateFragment: Hasło nie zostało stworzone!")
             }
         })
 
@@ -121,18 +122,17 @@ class PasswordCreate : Fragment() {
         val callback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
-                Log.d("NotesFragment", "$errorCode :: $errString")
+                Log.d("PasswordCreateFragment", "$errorCode :: $errString")
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
-                Log.d("NotesFragment", "Authentication failed for an unknown reason")
+                Log.d("PasswordCreateFragment", "Authentication failed for an unknown reason")
             }
 
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                Log.d("NotesFragment", "Authentication was successful")
-
+                Log.d("PasswordCreateFragment", "Authentication was successful")
                 processData(result.cryptoObject)
             }
         }
@@ -146,6 +146,7 @@ class PasswordCreate : Fragment() {
                 .setTitle(getString(R.string.prompt_info_title))
                 .setDescription(getString(R.string.prompt_info_description))
                 .setConfirmationRequired(false)
+                .setNegativeButtonText(getString(R.string.negative_button_text))
                 .build()
         return promptInfo
     }
@@ -159,11 +160,14 @@ class PasswordCreate : Fragment() {
     }
 
     private fun processData(cryptoObject: BiometricPrompt.CryptoObject?) {
-            val text = binding.viewModel.getPassword()
+            val text = binding.viewModel!!.getPassword()
             val encryptedData = cryptographyManager.encryptData(text, cryptoObject?.cipher!!)
             ciphertext = encryptedData.ciphertext
             initializationVector = encryptedData.initializationVector
-            binding.viewModel?.saveEncryptedPassword(ciphertext, initializationVector)
+            println("ciphertext: $ciphertext")
+            println("iv: $initializationVector")
+            binding.viewModel!!.saveEncryptedPassword(ciphertext, initializationVector)
+            binding.viewModel!!.navigateToNoteFragment()
         }
 
     // FUNKCJE DO UKRYCIA KLAWIATURY PO KLIKNIECIU PRZYCISKU

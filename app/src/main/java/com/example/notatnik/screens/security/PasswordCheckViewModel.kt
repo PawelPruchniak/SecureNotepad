@@ -9,10 +9,13 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.Notes
 import com.example.notatnik.database.NotesDatabaseDao
+import com.example.notatnik.database.Password
+import com.example.notatnik.database.PasswordDatabaseDao
 import java.util.*
 
 class PasswordCheckViewModel(
-        val database: NotesDatabaseDao,
+        databaseNote: NotesDatabaseDao,
+        databasePassword: PasswordDatabaseDao,
         application: Application
 ) : AndroidViewModel(application) {
 
@@ -26,22 +29,40 @@ class PasswordCheckViewModel(
     val checkPasswordEvent: LiveData<Boolean>
         get() = _checkPasswordEvent
 
+    // Event aktywowany po kliknięciu przycisku Login
+    private val _checkFingerPrintEvent = MutableLiveData<Boolean>()
+    val checkFingerPrintEvent: LiveData<Boolean>
+        get() = _checkFingerPrintEvent
+
     // Event aktywoowany po niepoprawnym wpisaniu hasła
     private val _changeLoginTxtEvent = MutableLiveData<Boolean>()
     val changeLoginTxtEvent: LiveData<Boolean>
         get() = _changeLoginTxtEvent
 
+    private val _databaseIv = MutableLiveData<ByteArray>()
+    val databaseIv: LiveData<ByteArray>
+        get() = _databaseIv
+
+    private val _databasePasswordEncrypted = MutableLiveData<ByteArray>()
+    val databasePasswordEncrypted: LiveData<ByteArray>
+        get() = _databasePasswordEncrypted
+
     private var password: String? = null
+
+
     var note = MediatorLiveData<Notes>()
+    var passwordDatabase = MediatorLiveData<Password>()
 
     init {
         // Pobieranie zaszyfrowanej notatki
-        note.addSource(database.getLastNote(), note::setValue)
+        note.addSource(databaseNote.getLastNote(), note::setValue)
+        passwordDatabase.addSource(databasePassword.getLastPassword(), passwordDatabase::setValue)
     }
 
     // Funkcja sprawdzająca poprawność wpisanego hasła
     fun checkPassword(password: String): Boolean {
 
+        println("HASŁO ROZSZYFROWANE: $password")
         val base64Encrypted = note.value?.noteEncrypted
         val base64Salt = note.value?.noteSalt
         val base64Iv  = note.value?.noteIv
@@ -61,8 +82,23 @@ class PasswordCheckViewModel(
         return dataDecrypted != null
     }
 
+    private fun initizalizePassword() {
+        val base64Encrypted = passwordDatabase.value?.passwordEncrypted
+        val iv = passwordDatabase.value?.passwordIv
+        _databasePasswordEncrypted.value = Base64.decode(base64Encrypted, Base64.DEFAULT)
+        _databaseIv.value = Base64.decode(iv, Base64.DEFAULT)
+    }
+
     fun getPassword(): String? {
         return password
+    }
+    fun authorizeButtonClicked() {
+        initizalizePassword()
+        _checkFingerPrintEvent.value = true
+    }
+
+    fun onCheckFingerPrintEventComplete() {
+        _checkFingerPrintEvent.value = false
     }
 
     fun loginButtonClicked() {

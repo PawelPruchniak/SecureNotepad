@@ -54,7 +54,6 @@ class PasswordCreateViewModel(
     fun passwordIsGood(password_1: String, password_2: String): Boolean{
         if (password_1.length  >= 8 && password_1 == password_2){
             password = password_1
-            updateDatabase()
             return true
         }
         return false
@@ -63,30 +62,34 @@ class PasswordCreateViewModel(
     private fun updateDatabase(){
         uiScope.launch {
             withContext(Dispatchers.IO){
-                val passwordExists = BooleanPassword()
-                passwordExists.passwordBool = true
-                databaseBooleanPassword.insert(passwordExists)
+                val booleanPassword = BooleanPassword()
+                booleanPassword.passwordBool = true
+                databaseBooleanPassword.insert(booleanPassword)
             }
         }
-        Log.i("PasswordCreateViewModel", "PasswordExists was added to database!")
+        Log.i("PasswordCreateViewModel", "BooleanPassword was added to booleanPasswordDatabase!")
     }
 
     fun saveEncryptedPassword(password: ByteArray, iv: ByteArray) {
+        println("JESTEM TU 1")
         uiScope.launch {
             withContext(Dispatchers.IO){
+                println("JESTEM TU 2")
                 val newPassword = Password()
 
                 val password64 = Base64.encodeToString(password, Base64.DEFAULT)
                 val iv64 = Base64.encodeToString(iv, Base64.DEFAULT)
 
+                println("password: $password")
+                println("iv: $iv")
                 newPassword.passwordEncrypted = password64
                 newPassword.passwordIv = iv64
 
                 databasePassword.insert(newPassword)
-                navigateToNoteFragment()
+                println("JESTEM TU 3")
             }
         }
-        Log.i("NotesViewModel", "Note was added to database!")
+        Log.i("PasswordCreateViewModel", "Password was added to passwordDatabase!")
     }
 
     fun getPassword(): String {
@@ -109,7 +112,8 @@ class PasswordCreateViewModel(
         _navigateToPasswordCheckFragment.value = true
     }
 
-    private fun navigateToNoteFragment(){
+    fun navigateToNoteFragment(){
+        updateDatabase()
         _navigateToNoteFragment.value = true
     }
 

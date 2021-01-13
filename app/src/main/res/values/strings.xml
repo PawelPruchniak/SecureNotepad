@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Notatnik</string>
-    <string name="login_btn_string">Login</string>
+    <string name="login_btn_string">Login by password</string>
     <string name="login_txt_string">Enter you password:</string>
     <string name="save_note_btn_string">Save</string>
     <string name="second_password_string">Repeat password:</string>
@@ -16,4 +16,6 @@
 
     <string name="prompt_info_title">Notes app Authentication</string>
     <string name="prompt_info_description">App is using Android biometric authentication</string>
+    <string name="negative_button_text">Close</string>
+    <string name="authorize_btn_text">Login by fingerprint</string>
 </resources>
