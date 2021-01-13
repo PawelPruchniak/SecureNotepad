@@ -13,4 +13,7 @@
     <string name="password_change_error_txt">Passwords don\'t match or password is exacly like previous</string>
     <string name="wrong_password_string">Wrong password, try again:</string>
     <string name="password_dont_match_string">Passwords don\'t match</string>
+
+    <string name="prompt_info_title">Notes app Authentication</string>
+    <string name="prompt_info_description">App is using Android biometric authentication</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.example.notatnik.screens.security
 
 import android.app.Application
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -8,10 +9,13 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.notatnik.database.BooleanPassword
 import com.example.notatnik.database.BooleanPasswordDatabaseDao
+import com.example.notatnik.database.Password
+import com.example.notatnik.database.PasswordDatabaseDao
 import kotlinx.coroutines.*
 
 class PasswordCreateViewModel(
-        val database: BooleanPasswordDatabaseDao,
+        val databaseBooleanPassword: BooleanPasswordDatabaseDao,
+        val databasePassword: PasswordDatabaseDao,
         application: Application,
 ) : AndroidViewModel(application) {
 
@@ -44,7 +48,7 @@ class PasswordCreateViewModel(
 
     init {
         // Pobieranie zmiennej z hasłem z bazy danych
-        passwordExists.addSource(database.getLastBooleanPassword(), passwordExists::setValue)
+        passwordExists.addSource(databaseBooleanPassword.getLastBooleanPassword(), passwordExists::setValue)
     }
 
     fun passwordIsGood(password_1: String, password_2: String): Boolean{
@@ -61,15 +65,30 @@ class PasswordCreateViewModel(
             withContext(Dispatchers.IO){
                 val passwordExists = BooleanPassword()
                 passwordExists.passwordBool = true
-                database.insert(passwordExists)
+                databaseBooleanPassword.insert(passwordExists)
             }
         }
         Log.i("PasswordCreateViewModel", "PasswordExists was added to database!")
     }
 
-    fun saveEncryptedPassword() {
+    fun saveEncryptedPassword(password: ByteArray, iv: ByteArray) {
+        uiScope.launch {
+            withContext(Dispatchers.IO){
+                val newPassword = Password()
 
+                val password64 = Base64.encodeToString(password, Base64.DEFAULT)
+                val iv64 = Base64.encodeToString(iv, Base64.DEFAULT)
+
+                newPassword.passwordEncrypted = password64
+                newPassword.passwordIv = iv64
+
+                databasePassword.insert(newPassword)
+                navigateToNoteFragment()
+            }
+        }
+        Log.i("NotesViewModel", "Note was added to database!")
     }
+
     fun getPassword(): String {
         return password
     }
@@ -90,7 +109,7 @@ class PasswordCreateViewModel(
         _navigateToPasswordCheckFragment.value = true
     }
 
-    fun navigateToNoteFragment(){
+    private fun navigateToNoteFragment(){
         _navigateToNoteFragment.value = true
     }
 

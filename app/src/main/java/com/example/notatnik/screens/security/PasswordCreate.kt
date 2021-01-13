@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.notatnik.R
 import com.example.notatnik.database.BooleanPasswordDatabase
+import com.example.notatnik.database.PasswordDatabase
 import com.example.notatnik.databinding.PasswrdCreateFragmentBinding
 import com.example.notatnik.screens.security.biometric.CryptographyManager
 
@@ -29,7 +30,6 @@ class PasswordCreate : Fragment() {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
-    private var readyToEncrypt: Boolean = false
     private lateinit var cryptographyManager: CryptographyManager
     private lateinit var secretKeyName: String
     private lateinit var ciphertext:ByteArray
@@ -45,9 +45,10 @@ class PasswordCreate : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.passwrd_create_fragment, container, false)
 
         application = requireNotNull(this.activity).application
-        val dataSource = BooleanPasswordDatabase.getInstance(application).passwordDatabaseDao
+        val dataSource1 = BooleanPasswordDatabase.getInstance(application).booleanPasswordDatabaseDao
+        val dataSource2 = PasswordDatabase.getInstance(application).passwordDatabaseDao
 
-        val viewModelFactory = PasswordCreateViewModelFactory(dataSource, application)
+        val viewModelFactory = PasswordCreateViewModelFactory(dataSource1, dataSource2, application)
         val securityViewModel = ViewModelProvider(this, viewModelFactory).get(
                 PasswordCreateViewModel::class.java
         )
@@ -132,7 +133,7 @@ class PasswordCreate : Fragment() {
                 super.onAuthenticationSucceeded(result)
                 Log.d("NotesFragment", "Authentication was successful")
 
-                /** NEED TO START NAVIGATE **/
+                processData(result.cryptoObject)
             }
         }
 

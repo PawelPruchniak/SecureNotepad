@@ -11,7 +11,7 @@ import net.sqlcipher.database.SupportFactory
 @Database(entities = [BooleanPassword::class], version = 5, exportSchema = false)
 abstract class BooleanPasswordDatabase : RoomDatabase() {
 
-    abstract val passwordDatabaseDao: BooleanPasswordDatabaseDao
+    abstract val booleanPasswordDatabaseDao: BooleanPasswordDatabaseDao
 
     companion object {
         @Volatile
